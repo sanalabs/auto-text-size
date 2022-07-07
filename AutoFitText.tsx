@@ -2,130 +2,84 @@ import {
   DetailedHTMLProps,
   HTMLAttributes,
   ReactElement,
-  ReactNode,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 
-// function throttle<T extends unknown[]>(
-//   func: (...args: T) => void,
-//   delayMs: number
-// ): (...args: T) => void {
-//   let callCount = 0;
-//   const wrapped = (...args: T): void => {
-//     callCount++;
+/**
+ * Never call `func` more than once per animation frame.
+ *
+ * Using requestAnimationFrame in this way ensures that we render as often as
+ * possible without blocking the UI.
+ */
+function throttleToNextFrame(func: () => void): () => void {
+  let wait = false;
 
-//     if (callCount === 1) {
-//       func(...args);
-
-//       setTimeout(() => {
-//         callCount = 0;
-//         wrapped(...args);
-//       }, delayMs);
-//     }
-//   };
-
-//   return wrapped;
-// }
-
-export function throttle<T extends unknown[]>(
-  func: (...args: T) => void
-): (...args: T) => void {
-  console.log("throttle init");
-  let count = 0;
-
-  const wrapped = (...args: T): void => {
-    console.log("calling", count);
-
-    if (count === 0) {
-      func(...args);
+  return () => {
+    if (!wait) {
+      wait = true;
       requestAnimationFrame(() => {
-        console.log("tick");
-        if (count > 1) {
-          count = 0;
-          wrapped(...args);
-        } else {
-          count = 0;
-        }
+        func();
+        wait = false;
       });
     }
-
-    count += 1;
   };
-
-  return wrapped;
 }
 
-export type Props = {
+type Props = {
   multiline?: boolean;
   ellipsis?: boolean;
   minFontSizePx?: number;
   maxFontSizePx?: number;
 };
 
+/**
+ * Adjust the font size of `innerEl` so that it doesn't overflow `containerEl`.
+ */
 export function autoFitText({
   innerEl,
+  containerEl,
   multiline,
   ellipsis,
   minFontSizePx = 5,
   maxFontSizePx = 200,
-}: {
+}: Props & {
   innerEl: HTMLElement | undefined | null;
-} & Props): void {
-  if (!innerEl) return;
-
-  const containerEl = innerEl.parentElement;
-  if (!containerEl) return;
+  containerEl: HTMLElement | undefined | null;
+}): void {
+  if (!innerEl || !containerEl) return;
 
   if (containerEl.children.length > 1) {
     console.warn(
       `AutoSizeText has ${
         containerEl.children.length - 1
-      } siblins. This may interfere with the auto-size algorithm.`
+      } siblings. This may interfere with the auto-size algorithm.`
     );
   }
-
-  const displayStyle = window
-    .getComputedStyle(innerEl, null)
-    .getPropertyValue("display");
-
-  // if (displayStyle !== "inline-block") {
-  //   throw new Error("Element should have style `display: inline-block`.");
-  // }
 
   if (innerEl.scrollHeight === 0 || innerEl.scrollWidth === 0) {
     return;
   }
 
-  const delta = 1;
+  const deltaFactor = 1.05; // Adjust font size 5% in each iteration
 
   const fontSizeStr = window
     .getComputedStyle(innerEl, null)
     .getPropertyValue("font-size");
   let fontSizePx = parseFloat(fontSizeStr);
 
-  // console.log(fontSizeStr, fontSizePx);
-
-  console.log(
-    "pre loop",
-    `(${innerEl.scrollWidth}, ${innerEl.scrollHeight}) - (${containerEl.clientWidth}, ${containerEl.clientHeight})`
-  );
+  const setFontSizePx = (px: number): void => {
+    fontSizePx = px;
+    innerEl.style.fontSize = `${fontSizePx}px`;
+  };
 
   if (!multiline) {
     while (
       innerEl.scrollWidth <= containerEl.clientWidth &&
       fontSizePx < maxFontSizePx
     ) {
-      fontSizePx += delta;
-      innerEl.style.fontSize = `${fontSizePx}px`;
-      console.log(
-        "singleline, looping up",
-        fontSizePx,
-        `(${innerEl.scrollWidth}, ${innerEl.scrollHeight}) - (${containerEl.clientWidth}, ${containerEl.clientHeight})`
-      );
+      setFontSizePx(fontSizePx * deltaFactor);
     }
 
     while (
@@ -134,13 +88,7 @@ export function autoFitText({
         : innerEl.scrollWidth > containerEl.clientWidth) &&
       fontSizePx > minFontSizePx
     ) {
-      fontSizePx -= delta;
-      innerEl.style.fontSize = `${fontSizePx}px`;
-      console.log(
-        "singleline, looping down",
-        fontSizePx,
-        `(${innerEl.scrollWidth}, ${innerEl.scrollHeight}) - (${containerEl.clientWidth}, ${containerEl.clientHeight})`
-      );
+      setFontSizePx(fontSizePx / deltaFactor);
     }
   } else {
     /**
@@ -155,13 +103,7 @@ export function autoFitText({
       innerEl.scrollHeight <= containerEl.clientHeight &&
       fontSizePx < maxFontSizePx
     ) {
-      fontSizePx += delta;
-      innerEl.style.fontSize = `${fontSizePx}px`;
-      // console.log(
-      //   "multiline, looping up",
-      //   fontSizePx,
-      //   `(${innerEl.scrollWidth}, ${innerEl.scrollHeight}) - (${containerEl.clientWidth}, ${containerEl.clientHeight})`
-      // );
+      setFontSizePx(fontSizePx * deltaFactor);
     }
 
     // Must use `>` rather than `>=` since the width can be max for long text,
@@ -171,37 +113,50 @@ export function autoFitText({
         innerEl.scrollHeight > containerEl.clientHeight) &&
       fontSizePx > minFontSizePx
     ) {
-      fontSizePx -= delta;
-      innerEl.style.fontSize = `${fontSizePx}px`;
-      // console.log(
-      //   "multiline, looping down",
-      //   fontSizePx,
-      //   `(${innerEl.scrollWidth}, ${innerEl.scrollHeight}) - (${containerEl.clientWidth}, ${containerEl.clientHeight})`
-      // );
+      setFontSizePx(fontSizePx / deltaFactor);
     }
+  }
+
+  // The above loops can overshoot. Adjust for this. This is better than
+  // stopping the loops one iteration earlier, because then we wouldn't get all
+  // the way to the limit. Adjusting the setp size based on how close we are to
+  // the limit is messier than this.
+  if (fontSizePx < minFontSizePx) {
+    setFontSizePx(minFontSizePx);
+  }
+
+  if (fontSizePx > maxFontSizePx) {
+    setFontSizePx(maxFontSizePx);
   }
 }
 
+/**
+ * React component wrapping `autoFitText` for ease of use.
+ *
+ * ```jsx
+ * <AutoFitText>{title}</AutoFitText>
+ * ```
+ */
 export function AutoFitText({
-  children,
   multiline,
   ellipsis,
   maxFontSizePx,
   minFontSizePx,
+  as: Comp = "div",
   style = {},
+  children,
   ...rest
-}: Props &
-  DetailedHTMLProps<
+}: Props & { as?: string | React.ComponentType<any> } & DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >): ReactElement {
   const ref = useRef<HTMLInputElement>(null);
 
-  const run = useMemo(() => {
-    console.log("XXX");
-    return throttle(() =>
+  const throttledAutoFitText = useMemo(() => {
+    return throttleToNextFrame(() =>
       autoFitText({
         innerEl: ref.current,
+        containerEl: ref.current?.parentElement,
         multiline,
         ellipsis,
         maxFontSizePx,
@@ -210,12 +165,12 @@ export function AutoFitText({
     );
   }, [ellipsis, maxFontSizePx, minFontSizePx, multiline]);
 
-  useEffect(run, [children, run]);
+  useEffect(throttledAutoFitText, [children, throttledAutoFitText]);
 
   useEffect(() => {
-    window.addEventListener("resize", run);
-    return () => window.removeEventListener("resize", run);
-  }, [run]);
+    window.addEventListener("resize", throttledAutoFitText);
+    return () => window.removeEventListener("resize", throttledAutoFitText);
+  }, [throttledAutoFitText]);
 
   // Add styling only when necessary
   const containerStyle =
@@ -235,13 +190,13 @@ export function AutoFitText({
   } as const;
 
   return (
-    <div style={{ ...containerStyle, ...style }} {...rest}>
+    <Comp style={{ ...containerStyle, ...style }} {...rest}>
       <div
         ref={ref}
         style={multiline ? multilineInnerStyle : singlelineInnerStyle}
       >
         {children}
       </div>
-    </div>
+    </Comp>
   );
 }

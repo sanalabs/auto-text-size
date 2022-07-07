@@ -5,11 +5,11 @@ import { AutoFitText } from "../AutoFitText";
 const containerStyle = {
   width: "50%",
   height: "100px",
-  border: "1px solid",
+  border: "1px dashed #555",
 };
 
 const Home: NextPage = () => {
-  const [text, setText] = useState("Demo text Demo text");
+  const [text, setText] = useState("Demo text");
   const [minFontSizePx, setMinFontSizePx] = useState("10");
   const [maxFontSizePx, setMaxFontSizePx] = useState("200");
 
@@ -62,10 +62,11 @@ const Home: NextPage = () => {
 
   let demoSingleLine = (
     <>
-      <p>Single line:</p>
+      <p>Single line (h1)</p>
 
       <AutoFitText
         ellipsis
+        as='h1'
         minFontSizePx={parsedMinFontSizePx}
         maxFontSizePx={parsedMaxFontSizePx}
         style={{ ...containerStyle, height: "unset" }}
@@ -89,9 +90,9 @@ const Home: NextPage = () => {
         style={containerStyle}
       >
         {text}
-        <span style={{ color: "red", fontSize: "1rem" }}> Fixed</span>
-        <span style={{ color: "red", fontSize: "0.5em" }}> Half</span>
-        <span style={{ color: "red", fontSize: "2em" }}> Double</span>
+        <span style={{ color: "#fba", fontSize: "1rem" }}> Fixed</span>
+        <span style={{ color: "#fba", fontSize: "0.5em" }}> Half</span>
+        <span style={{ color: "#fba", fontSize: "2em" }}> Double</span>
       </AutoFitText>
     </>
   );
