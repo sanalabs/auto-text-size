@@ -1,4 +1,5 @@
 import {
+  CSSProperties,
   DetailedHTMLProps,
   HTMLAttributes,
   ReactElement,
@@ -27,7 +28,7 @@ function throttleToNextFrame(func: () => void): () => void {
   };
 }
 
-type Props = {
+type Config = {
   multiline?: boolean;
   ellipsis?: boolean;
   minFontSizePx?: number;
@@ -44,7 +45,7 @@ export function autoFitText({
   ellipsis,
   minFontSizePx = 5,
   maxFontSizePx = 200,
-}: Props & {
+}: Config & {
   innerEl: HTMLElement | undefined | null;
   containerEl: HTMLElement | undefined | null;
 }): void {
@@ -58,8 +59,25 @@ export function autoFitText({
     );
   }
 
+  // Add styling when necessary
+  console.log(!multiline && ellipsis)
+  if (!multiline && ellipsis) {
+    // This allows proper computation of the dimensions `innerEl`.
+    containerEl.style.display = "flex";
+    containerEl.style.alignItems = "start";
+  }
+
   if (innerEl.scrollHeight === 0 || innerEl.scrollWidth === 0) {
     return;
+  }
+
+  const innerDisplay = window
+  .getComputedStyle(innerEl, null)
+  .getPropertyValue("display");
+
+  console.log({innerDisplay})
+  if (innerDisplay !== 'block') {
+    innerEl.style.display = 'block' // Necessary to compute bounding box
   }
 
   const deltaFactor = 1.05; // Adjust font size 5% in each iteration
@@ -146,7 +164,9 @@ export function AutoFitText({
   style = {},
   children,
   ...rest
-}: Props & { as?: string | React.ComponentType<any> } & DetailedHTMLProps<
+}: Config & {
+  as?: string | React.ComponentType<any>;
+} & DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >): ReactElement {
@@ -172,31 +192,24 @@ export function AutoFitText({
     return () => window.removeEventListener("resize", throttledAutoFitText);
   }, [throttledAutoFitText]);
 
-  // Add styling only when necessary
-  const containerStyle =
-    multiline || !ellipsis ? {} : { display: "flex", alignItems: "start" };
+  if (ellipsis) {
+    style = {
+      ...style,
+      maxWidth: "100%",
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+    };
+  }
 
-  const commonInnerStyle = !ellipsis
-    ? {}
-    : { maxWidth: "100%", textOverflow: "ellipsis", overflow: "hidden" };
-
-  const singlelineInnerStyle = {
-    ...commonInnerStyle,
-    whiteSpace: "nowrap",
-  } as const;
-  const multilineInnerStyle = {
-    ...commonInnerStyle,
-    whiteSpace: "pre-wrap",
-  } as const;
+  if (multiline) {
+    style.whiteSpace = "pre-wrap";
+  } else {
+    style.whiteSpace = "nowrap";
+  }
 
   return (
-    <Comp style={{ ...containerStyle, ...style }} {...rest}>
-      <div
-        ref={ref}
-        style={multiline ? multilineInnerStyle : singlelineInnerStyle}
-      >
-        {children}
-      </div>
+    <Comp ref={ref} style={style} {...rest}>
+      {children}
     </Comp>
   );
 }

@@ -46,15 +46,16 @@ const Home: NextPage = () => {
     <>
       <p>Multiline:</p>
 
-      <AutoFitText
-        multiline
-        ellipsis
-        minFontSizePx={parsedMinFontSizePx}
-        maxFontSizePx={parsedMaxFontSizePx}
-        style={containerStyle}
-      >
-        {text}
-      </AutoFitText>
+      <div style={containerStyle}>
+        <AutoFitText
+          multiline
+          ellipsis
+          minFontSizePx={parsedMinFontSizePx}
+          maxFontSizePx={parsedMaxFontSizePx}
+        >
+          {text}
+        </AutoFitText>
+      </div>
 
       <hr />
     </>
@@ -62,17 +63,18 @@ const Home: NextPage = () => {
 
   let demoSingleLine = (
     <>
-      <p>Single line (h1)</p>
+      <p>Single line (strong)</p>
 
-      <AutoFitText
-        ellipsis
-        as='h1'
-        minFontSizePx={parsedMinFontSizePx}
-        maxFontSizePx={parsedMaxFontSizePx}
-        style={{ ...containerStyle, height: "unset" }}
-      >
-        {text}
-      </AutoFitText>
+      <div style={{ ...containerStyle, height: "unset" }}>
+        <AutoFitText
+          ellipsis
+          as="strong"
+          minFontSizePx={parsedMinFontSizePx}
+          maxFontSizePx={parsedMaxFontSizePx}
+        >
+          {text}
+        </AutoFitText>
+      </div>
 
       <hr />
     </>
@@ -82,18 +84,19 @@ const Home: NextPage = () => {
     <>
       <p>Advanced:</p>
 
-      <AutoFitText
-        multiline
-        ellipsis
-        minFontSizePx={parsedMinFontSizePx}
-        maxFontSizePx={parsedMaxFontSizePx}
-        style={containerStyle}
-      >
-        {text}
-        <span style={{ color: "#fba", fontSize: "1rem" }}> Fixed</span>
-        <span style={{ color: "#fba", fontSize: "0.5em" }}> Half</span>
-        <span style={{ color: "#fba", fontSize: "2em" }}> Double</span>
-      </AutoFitText>
+      <div style={containerStyle}>
+        <AutoFitText
+          multiline
+          ellipsis
+          minFontSizePx={parsedMinFontSizePx}
+          maxFontSizePx={parsedMaxFontSizePx}
+        >
+          {text}
+          <span style={{ color: "#fba", fontSize: "1rem" }}> Fixed</span>
+          <span style={{ color: "#fba", fontSize: "0.5em" }}> Half</span>
+          <span style={{ color: "#fba", fontSize: "2em" }}> Double</span>
+        </AutoFitText>
+      </div>
     </>
   );
 
