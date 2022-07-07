@@ -61,13 +61,15 @@ export function throttle<T extends unknown[]>(
 
 export type Props = {
   multiline?: boolean;
+  ellipsis?: boolean;
   minFontSizePx?: number;
   maxFontSizePx?: number;
 };
 
 export function autoFitText({
   innerEl,
-  multiline = false,
+  multiline,
+  ellipsis,
   minFontSizePx = 5,
   maxFontSizePx = 200,
 }: {
@@ -126,18 +128,10 @@ export function autoFitText({
       );
     }
 
-    /**
-     * `>=` rather than `>` to support ellipsis
-     *
-     * Required style on parent:
-     *
-     * ```css
-     * display: flex;
-     * align-items: 'start'
-     * ```
-     */
     while (
-      innerEl.scrollWidth >= containerEl.clientWidth &&
+      (ellipsis
+        ? innerEl.scrollWidth >= containerEl.clientWidth
+        : innerEl.scrollWidth > containerEl.clientWidth) &&
       fontSizePx > minFontSizePx
     ) {
       fontSizePx -= delta;
@@ -191,8 +185,10 @@ export function autoFitText({
 export function AutoFitText({
   children,
   multiline,
+  ellipsis,
   maxFontSizePx,
   minFontSizePx,
+  style = {},
   ...rest
 }: Props &
   DetailedHTMLProps<
@@ -207,11 +203,12 @@ export function AutoFitText({
       autoFitText({
         innerEl: ref.current,
         multiline,
+        ellipsis,
         maxFontSizePx,
         minFontSizePx,
       })
     );
-  }, [maxFontSizePx, minFontSizePx, multiline]);
+  }, [ellipsis, maxFontSizePx, minFontSizePx, multiline]);
 
   useEffect(run, [children, run]);
 
@@ -220,9 +217,31 @@ export function AutoFitText({
     return () => window.removeEventListener("resize", run);
   }, [run]);
 
+  // Add styling only when necessary
+  const containerStyle =
+    multiline || !ellipsis ? {} : { display: "flex", alignItems: "start" };
+
+  const commonInnerStyle = !ellipsis
+    ? {}
+    : { maxWidth: "100%", textOverflow: "ellipsis", overflow: "hidden" };
+
+  const singlelineInnerStyle = {
+    ...commonInnerStyle,
+    whiteSpace: "nowrap",
+  } as const;
+  const multilineInnerStyle = {
+    ...commonInnerStyle,
+    whiteSpace: "pre-wrap",
+  } as const;
+
   return (
-    <div ref={ref} {...rest}>
-      {children}
+    <div style={{ ...containerStyle, ...style }} {...rest}>
+      <div
+        ref={ref}
+        style={multiline ? multilineInnerStyle : singlelineInnerStyle}
+      >
+        {children}
+      </div>
     </div>
   );
 }

@@ -6,14 +6,6 @@ const containerStyle = {
   width: "50%",
   height: "100px",
   border: "1px solid",
-  display: "flex",
-  alignItems: 'start'
-};
-
-const commonAutoFitTextStyle = {
-  maxWidth: "100%",
-  textOverflow: "ellipsis",
-  overflow: "hidden",
 };
 
 const Home: NextPage = () => {
@@ -22,7 +14,7 @@ const Home: NextPage = () => {
   const [maxFontSizePx, setMaxFontSizePx] = useState("200");
 
   const parsedMinFontSizePx = parseInt(minFontSizePx);
-  const parsedMaxFontSize = parseInt(maxFontSizePx);
+  const parsedMaxFontSizePx = parseInt(maxFontSizePx);
 
   const config = (
     <>
@@ -54,16 +46,15 @@ const Home: NextPage = () => {
     <>
       <p>Multiline:</p>
 
-      <div style={containerStyle}>
-        <AutoFitText
-          multiline
-          minFontSizePx={parsedMinFontSizePx}
-          maxFontSizePx={parsedMaxFontSize}
-          style={{ ...commonAutoFitTextStyle, whiteSpace: "pre-wrap" }}
-        >
-          {text}
-        </AutoFitText>
-      </div>
+      <AutoFitText
+        multiline
+        ellipsis
+        minFontSizePx={parsedMinFontSizePx}
+        maxFontSizePx={parsedMaxFontSizePx}
+        style={containerStyle}
+      >
+        {text}
+      </AutoFitText>
 
       <hr />
     </>
@@ -73,15 +64,14 @@ const Home: NextPage = () => {
     <>
       <p>Single line:</p>
 
-      <div style={{ ...containerStyle, height: "unset" }}>
-        <AutoFitText
-          minFontSizePx={parsedMinFontSizePx}
-          maxFontSizePx={parsedMaxFontSize}
-          style={{ ...commonAutoFitTextStyle, whiteSpace: "nowrap" }}
-        >
-          {text}
-        </AutoFitText>
-      </div>
+      <AutoFitText
+        ellipsis
+        minFontSizePx={parsedMinFontSizePx}
+        maxFontSizePx={parsedMaxFontSizePx}
+        style={{ ...containerStyle, height: "unset" }}
+      >
+        {text}
+      </AutoFitText>
 
       <hr />
     </>
@@ -91,34 +81,33 @@ const Home: NextPage = () => {
     <>
       <p>Advanced:</p>
 
-      <div style={{ ...containerStyle }}>
-        <AutoFitText
-          multiline
-          minFontSizePx={parsedMinFontSizePx}
-          maxFontSizePx={parsedMaxFontSize}
-          style={{ ...commonAutoFitTextStyle, overflow: "hidden" }}
-        >
-          {text}
-          <span style={{ color: "red", fontSize: "1rem" }}> Fixed</span>
-          <span style={{ color: "red", fontSize: "0.5em" }}> Half</span>
-          <span style={{ color: "red", fontSize: "2em" }}> Double</span>
-        </AutoFitText>
-      </div>
+      <AutoFitText
+        multiline
+        ellipsis
+        minFontSizePx={parsedMinFontSizePx}
+        maxFontSizePx={parsedMaxFontSizePx}
+        style={containerStyle}
+      >
+        {text}
+        <span style={{ color: "red", fontSize: "1rem" }}> Fixed</span>
+        <span style={{ color: "red", fontSize: "0.5em" }}> Half</span>
+        <span style={{ color: "red", fontSize: "2em" }}> Double</span>
+      </AutoFitText>
     </>
   );
 
-  let warn = undefined
+  let warn = undefined;
   if (!isFinite(parsedMinFontSizePx)) warn = <>Invalid minFontSizePx</>;
-  if (!isFinite(parsedMaxFontSize)) warn = <>Invalid maxFontSizePx</>;
+  if (!isFinite(parsedMaxFontSizePx)) warn = <>Invalid maxFontSizePx</>;
 
   return (
     <div style={{ margin: "1rem" }}>
       {config}
       {warn || (
         <>
-          {/* {demoMultiline} */}
+          {demoMultiline}
           {demoSingleLine}
-          {/* {demoAdvanced} */}
+          {demoAdvanced}
         </>
       )}
     </div>
