@@ -1,34 +1,57 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AutoFit
 
-## Getting Started
+Automatically adjust the font size of an element so that it fills its container without overflowing. Supports multi-line and single-line.
 
-First, run the development server:
+The algorithm uses computed width and height and therefore works for all fonts types and variations. Not only text, it works for any elements with dimensions defined relative to font size (eg. `width: 1em`).
 
-```bash
-npm run dev
-# or
-yarn dev
+<img src="./multi-line.gif" width="300" />
+<img src="./single-line.gif" width="300" />
+
+[**Live demo**](todo:codesandbox)
+
+## React component `AutoFit`
+
+The `AutoFit` component automatically re-runs when `children` changes or when the browser resizes.
+
+```tsx
+import { AutoFit } from 'auto-fit'
+
+export const Title = ({ text }) => {
+  return (
+    <div style={{ maxWidth: '60%', margin: '0 auto' }}>
+      <AutoFit>{text}</AutoFit>
+    </div>
+  )
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### `AutoFit` Props
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `multiline` | `boolean` | `false` | Allow text to wrap and fit into both container width and height. |
+| `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
+| `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
+| `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
+| `as` | `string \| ReactComponent` | `'div'` | The underlying component that `AutoFit` will use. |
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Low-level `autoFit` function
 
-## Learn More
+The `autoFit` function is used by the `AutoFit` component.
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+import { autoFit } from 'auto-fit'
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+autoFit(options)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### `autoFit` options
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `containerEl` | `HTMLElement` | | The container element is used as bounding box for the inner element. |
+| `innerEl` | `HTMLElement` | | The inner element receives the adjusted font size. |
+| `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
+| `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
+| `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |

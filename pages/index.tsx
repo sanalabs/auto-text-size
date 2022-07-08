@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useState } from "react";
-import { AutoFitText } from "../AutoFitText";
+import { AutoFit } from "../AutoFit";
 
 const containerStyle = {
   width: "50%",
@@ -10,7 +10,7 @@ const containerStyle = {
 
 const Home: NextPage = () => {
   const [text, setText] = useState("Demo text");
-  const [minFontSizePx, setMinFontSizePx] = useState("10");
+  const [minFontSizePx, setMinFontSizePx] = useState("8");
   const [maxFontSizePx, setMaxFontSizePx] = useState("200");
 
   const parsedMinFontSizePx = parseInt(minFontSizePx);
@@ -18,6 +18,8 @@ const Home: NextPage = () => {
 
   const config = (
     <>
+      <p>This is a demo of AutoFit. See the docs.</p>
+
       <h3>Config</h3>
       <p>
         minFontSizePx:{" "}
@@ -47,14 +49,13 @@ const Home: NextPage = () => {
       <p>Multiline:</p>
 
       <div style={containerStyle}>
-        <AutoFitText
+        <AutoFit
           multiline
-          ellipsis
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
           {text}
-        </AutoFitText>
+        </AutoFit>
       </div>
 
       <hr />
@@ -63,17 +64,16 @@ const Home: NextPage = () => {
 
   let demoSingleLine = (
     <>
-      <p>Single line (strong)</p>
+      <p>Single line:</p>
 
       <div style={{ ...containerStyle, height: "unset" }}>
-        <AutoFitText
+        <AutoFit
           ellipsis
-          as="strong"
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
           {text}
-        </AutoFitText>
+        </AutoFit>
       </div>
 
       <hr />
@@ -82,20 +82,30 @@ const Home: NextPage = () => {
 
   let demoAdvanced = (
     <>
-      <p>Advanced:</p>
+      <p>Advanced (it works with any font variations and anything sized relative to font size):</p>
 
-      <div style={containerStyle}>
-        <AutoFitText
+      <div style={{ ...containerStyle, height: 150 }}>
+        <AutoFit
           multiline
+          as="em"
           ellipsis
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
           {text}
-          <span style={{ color: "#fba", fontSize: "1rem" }}> Fixed</span>
-          <span style={{ color: "#fba", fontSize: "0.5em" }}> Half</span>
-          <span style={{ color: "#fba", fontSize: "2em" }}> Double</span>
-        </AutoFitText>
+          <span style={{ color: "#fba", fontSize: "1.5em" }}> 1.5em</span>
+          <span style={{ color: "#fba", fontSize: "0.75em" }}> 0.75em</span>
+          <strong style={{ color: "#fba", fontSize: "1.5rem" }}> 1.5rem</strong>
+          <span
+            style={{
+              display: "inline-block",
+              backgroundColor: "#fba",
+              width: "1em",
+              height: "1em",
+              marginLeft: '0.5em',
+            }}
+          />
+        </AutoFit>
       </div>
     </>
   );

@@ -12,7 +12,7 @@ import {
  * Never call `func` more than once per animation frame.
  *
  * Using requestAnimationFrame in this way ensures that we render as often as
- * possible without blocking the UI.
+ * possible without excessively blocking the UI.
  */
 function throttleToNextFrame(func: () => void): () => void {
   let wait = false;
@@ -38,12 +38,12 @@ type Config = {
 /**
  * Adjust the font size of `innerEl` so that it doesn't overflow `containerEl`.
  */
-export function autoFitText({
+export function autoFit({
   innerEl,
   containerEl,
   multiline,
   ellipsis,
-  minFontSizePx = 5,
+  minFontSizePx = 8,
   maxFontSizePx = 200,
 }: Config & {
   innerEl: HTMLElement | undefined | null;
@@ -60,36 +60,52 @@ export function autoFitText({
   }
 
   // Add styling when necessary
-  console.log(!multiline && ellipsis)
   if (!multiline && ellipsis) {
     // This allows proper computation of the dimensions `innerEl`.
     containerEl.style.display = "flex";
     containerEl.style.alignItems = "start";
   }
 
-  if (innerEl.scrollHeight === 0 || innerEl.scrollWidth === 0) {
-    return;
+  if (multiline) {
+    innerEl.style.whiteSpace = "pre-wrap";
+    innerEl.style.wordBreak = "normal";
+    innerEl.style.hyphens = "none";
+    innerEl.style.overflowWrap = "break-word";
+  } else {
+    innerEl.style.whiteSpace = "nowrap";
+  }
+
+  if (ellipsis) {
+    innerEl.style.maxWidth = "100%";
+    innerEl.style.textOverflow = "ellipsis";
+    innerEl.style.overflow = "hidden";
   }
 
   const innerDisplay = window
-  .getComputedStyle(innerEl, null)
-  .getPropertyValue("display");
+    .getComputedStyle(innerEl, null)
+    .getPropertyValue("display");
 
-  console.log({innerDisplay})
-  if (innerDisplay !== 'block') {
-    innerEl.style.display = 'block' // Necessary to compute bounding box
+  if (innerDisplay !== "block") {
+    innerEl.style.display = "block"; // Necessary to compute bounding box
   }
 
-  const deltaFactor = 1.05; // Adjust font size 5% in each iteration
+  if (innerEl.scrollWidth === 0 || innerEl.scrollHeight === 0) {
+    return;
+  }
+
+  const fontSizeAdjustmentFactor = 1.05;
 
   const fontSizeStr = window
     .getComputedStyle(innerEl, null)
     .getPropertyValue("font-size");
   let fontSizePx = parseFloat(fontSizeStr);
 
+  let iterations = 0;
+
   const setFontSizePx = (px: number): void => {
     fontSizePx = px;
     innerEl.style.fontSize = `${fontSizePx}px`;
+    iterations++;
   };
 
   if (!multiline) {
@@ -97,7 +113,7 @@ export function autoFitText({
       innerEl.scrollWidth <= containerEl.clientWidth &&
       fontSizePx < maxFontSizePx
     ) {
-      setFontSizePx(fontSizePx * deltaFactor);
+      setFontSizePx(fontSizePx * fontSizeAdjustmentFactor);
     }
 
     while (
@@ -106,7 +122,7 @@ export function autoFitText({
         : innerEl.scrollWidth > containerEl.clientWidth) &&
       fontSizePx > minFontSizePx
     ) {
-      setFontSizePx(fontSizePx / deltaFactor);
+      setFontSizePx(fontSizePx / fontSizeAdjustmentFactor);
     }
   } else {
     /**
@@ -121,7 +137,7 @@ export function autoFitText({
       innerEl.scrollHeight <= containerEl.clientHeight &&
       fontSizePx < maxFontSizePx
     ) {
-      setFontSizePx(fontSizePx * deltaFactor);
+      setFontSizePx(fontSizePx * fontSizeAdjustmentFactor);
     }
 
     // Must use `>` rather than `>=` since the width can be max for long text,
@@ -131,7 +147,7 @@ export function autoFitText({
         innerEl.scrollHeight > containerEl.clientHeight) &&
       fontSizePx > minFontSizePx
     ) {
-      setFontSizePx(fontSizePx / deltaFactor);
+      setFontSizePx(fontSizePx / fontSizeAdjustmentFactor);
     }
   }
 
@@ -146,22 +162,29 @@ export function autoFitText({
   if (fontSizePx > maxFontSizePx) {
     setFontSizePx(maxFontSizePx);
   }
+
+  // Each iteration is a performance hit. There is room for improving the
+  // algorithm. Currently it is doing a simple linear search. Binary search is
+  // not necessarily better since the linear search will require fewer steps in
+  // most cases when the text is being written by the user,
+  // character-by-character. Ideally the algorithm would guesses the required
+  // updated based on the measured dimensions.
+  console.debug(`AutoFit executed with ${iterations} iterations`);
 }
 
 /**
- * React component wrapping `autoFitText` for ease of use.
+ * React component wrapping `autoFit` for ease of use.
  *
  * ```jsx
- * <AutoFitText>{title}</AutoFitText>
+ * <AutoFit>{text}</AutoFit>
  * ```
  */
-export function AutoFitText({
+export function AutoFit({
   multiline,
   ellipsis,
   maxFontSizePx,
   minFontSizePx,
-  as: Comp = "div",
-  style = {},
+  as: Comp = "div", // TODO: The `...rest` props are not typed to reflect another `as`.
   children,
   ...rest
 }: Config & {
@@ -174,7 +197,7 @@ export function AutoFitText({
 
   const throttledAutoFitText = useMemo(() => {
     return throttleToNextFrame(() =>
-      autoFitText({
+      autoFit({
         innerEl: ref.current,
         containerEl: ref.current?.parentElement,
         multiline,
@@ -192,23 +215,8 @@ export function AutoFitText({
     return () => window.removeEventListener("resize", throttledAutoFitText);
   }, [throttledAutoFitText]);
 
-  if (ellipsis) {
-    style = {
-      ...style,
-      maxWidth: "100%",
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-    };
-  }
-
-  if (multiline) {
-    style.whiteSpace = "pre-wrap";
-  } else {
-    style.whiteSpace = "nowrap";
-  }
-
   return (
-    <Comp ref={ref} style={style} {...rest}>
+    <Comp ref={ref} {...rest}>
       {children}
     </Comp>
   );
