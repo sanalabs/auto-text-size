@@ -73,7 +73,7 @@ export function autoFit({
   let iterations = 0;
 
   const setFontSizePx = (px: number): void => {
-    fontSizePx = px;
+    fontSizePx = Math.min(Math.max(px, minFontSizePx), maxFontSizePx);
     innerEl.style.fontSize = `${fontSizePx}px`;
     iterations++;
   };
@@ -119,18 +119,6 @@ export function autoFit({
     ) {
       setFontSizePx(fontSizePx / fontSizeAdjustmentFactor);
     }
-  }
-
-  // The above loops can overshoot. Adjust for this. This is better than
-  // stopping the loops one iteration earlier, because then we wouldn't get all
-  // the way to the limit. Adjusting the setp size based on how close we are to
-  // the limit is messier than this.
-  if (fontSizePx < minFontSizePx) {
-    setFontSizePx(minFontSizePx);
-  }
-
-  if (fontSizePx > maxFontSizePx) {
-    setFontSizePx(maxFontSizePx);
   }
 
   // Each iteration is a performance hit. There is room for improving the
