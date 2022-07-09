@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es2017", "dom"],
+    "target": "esnext",
+    "lib": ["dom"],
     
     "module": "esnext",
     "declaration": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "outDir": "dist/esm",
+    "declarationMap": true,
     "declarationDir": "dist/types",
+    "outDir": "dist/esm",
+
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
 
     "strict": true,
     "alwaysStrict": true,
@@ -23,8 +25,8 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "jsx": "react",
-    "incremental": true
+    "incremental": true,
+    "jsx": "react"
   },
   "include": ["src"],
 }

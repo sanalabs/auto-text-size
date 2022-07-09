@@ -11,7 +11,7 @@ The algorithm uses computed width and height and therefore works for all font ty
 
 ## React component `AutoFit`
 
-The `AutoFit` component automatically re-runs when `children` changes and when the browser resizes.
+The `AutoFit` component automatically re-runs when `children` changes and when the viewport resizes.
 
 ```tsx
 import { AutoFit } from 'auto-fit'
@@ -60,7 +60,9 @@ autoFit(options)
 
 ## Developing
 
-Because of [this](https://github.com/facebook/react/issues/14257), we use [Yalc](https://github.com/wclr/yalc) rather than `yarn link`. A linking approach is preferred over yarn workspaces since we want to run the package as it would appear in the real world.
+When developing one typically wants to see the output in the example application without having to publish and install. We achieve this by linking the local package into the example app.
+
+Because of [issues with `yarn link`](https://github.com/facebook/react/issues/14257), we use [Yalc](https://github.com/wclr/yalc). A linking approach is preferred over yarn workspaces since we want to run the package as it would appear in the real world.
 
 ```sh
 npm i yalc -g

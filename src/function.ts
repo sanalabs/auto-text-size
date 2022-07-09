@@ -6,7 +6,7 @@ export type Options = {
 };
 
 /**
- * Adjust the font size of `innerEl` so that it doesn't overflow `containerEl`.
+ * Adjusts the font size of `innerEl` so that it fits `containerEl`.
  */
 export function autoFit({
   innerEl,

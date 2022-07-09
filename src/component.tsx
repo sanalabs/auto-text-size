@@ -9,7 +9,7 @@ import React, {
 import { autoFit, Options } from "./function";
 
 /**
- * Never call `func` more than once per animation frame.
+ * Ensures that `func` is not called more than once per animation frame.
  *
  * Using requestAnimationFrame in this way ensures that we render as often as
  * possible without excessively blocking the UI.
@@ -29,11 +29,7 @@ function throttleToNextFrame(func: () => void): () => void {
 }
 
 /**
- * React component wrapping `autoFit` for ease of use.
- *
- * ```jsx
- * <AutoFit>{text}</AutoFit>
- * ```
+ * Adjusts the font size so that the content fits its container.
  */
 export function AutoFit({
   multiline,
@@ -51,7 +47,7 @@ export function AutoFit({
   >): ReactElement {
   const ref = useRef<HTMLInputElement>(null);
 
-  const throttledAutoFitText = useMemo(() => {
+  const throttledAutoFit = useMemo(() => {
     return throttleToNextFrame(() =>
       autoFit({
         innerEl: ref.current,
@@ -64,12 +60,12 @@ export function AutoFit({
     );
   }, [ellipsis, maxFontSizePx, minFontSizePx, multiline]);
 
-  useEffect(throttledAutoFitText, [children, throttledAutoFitText]);
+  useEffect(throttledAutoFit, [children, throttledAutoFit]);
 
   useEffect(() => {
-    window.addEventListener("resize", throttledAutoFitText);
-    return () => window.removeEventListener("resize", throttledAutoFitText);
-  }, [throttledAutoFitText]);
+    window.addEventListener("resize", throttledAutoFit);
+    return () => window.removeEventListener("resize", throttledAutoFit);
+  }, [throttledAutoFit]);
 
   return (
     <Comp ref={ref} {...rest}>

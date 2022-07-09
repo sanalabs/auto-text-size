@@ -1,17 +1,20 @@
 {
   "name": "auto-fit",
   "version": "0.1.0",
+  "license": "MIT",
   "exports": {
     "import": "./dist/esm/index.js",
     "require": "./dist/cjs/index.js",
     "default": "./dist/esm/index.js"
   },
   "files": [
+    "src/**/*",
     "dist/**/*.js",
     "dist/**/*.js.map",
-    "dist/**/*.d.ts"
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map"
   ],
-  "types": "./dist/types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc & tsc --project tsconfig.cjs.json",
