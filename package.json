@@ -1,24 +1,30 @@
 {
-  "name": "auto-fit-text-example",
+  "name": "auto-fit",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js",
+    "default": "./dist/esm/index.js"
   },
-  "dependencies": {
-    "next": "12.2.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts"
+  ],
+  "types": "./dist/types/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsc & tsc --project tsconfig.cjs.json",
+    "watch": "tsc-watch --onSuccess \"yalc push\""
+  },
+  "peerDependencies": {
+    "react": "*"
   },
   "devDependencies": {
     "@types/node": "18.0.3",
     "@types/react": "18.0.15",
-    "@types/react-dom": "18.0.6",
-    "eslint": "8.19.0",
-    "eslint-config-next": "12.2.0",
+    "tsc-watch": "^5.0.3",
     "typescript": "4.7.4"
-  }
+  },
+  "packageManager": "yarn@3.2.1"
 }

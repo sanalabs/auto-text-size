@@ -1,6 +1,5 @@
-import type { NextPage } from "next";
+import { AutoFit } from "auto-fit";
 import { useState } from "react";
-import { AutoFit } from "../AutoFit";
 
 const containerStyle = {
   width: "50%",
@@ -8,7 +7,7 @@ const containerStyle = {
   border: "1px dashed #555",
 };
 
-const Home: NextPage = () => {
+export default function Page() {
   const [text, setText] = useState("Demo text");
   const [minFontSizePx, setMinFontSizePx] = useState("8");
   const [maxFontSizePx, setMaxFontSizePx] = useState("200");
@@ -82,7 +81,10 @@ const Home: NextPage = () => {
 
   let demoAdvanced = (
     <>
-      <p>Advanced (it works with any font variations and anything sized relative to font size):</p>
+      <p>
+        Advanced (it works with any font variations and anything sized relative
+        to font size):
+      </p>
 
       <div style={{ ...containerStyle, height: 150 }}>
         <AutoFit
@@ -102,7 +104,7 @@ const Home: NextPage = () => {
               backgroundColor: "#fba",
               width: "1em",
               height: "1em",
-              marginLeft: '0.5em',
+              marginLeft: "0.5em",
             }}
           />
         </AutoFit>
@@ -126,6 +128,4 @@ const Home: NextPage = () => {
       )}
     </div>
   );
-};
-
-export default Home;
+}

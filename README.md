@@ -1,17 +1,17 @@
 # AutoFit
 
-Automatically adjust the font size of an element so that it fills its container without overflowing. Supports multi-line and single-line.
+Automatically fit text into its container, preventing overflow and underflow.
 
-The algorithm uses computed width and height and therefore works for all fonts types and variations. Not only text, it works for any elements with dimensions defined relative to font size (eg. `width: 1em`).
+The algorithm uses computed width and height and therefore works for all font types and variations. It adjusts the font size of a given element so that it precisely fills its container. Not only text, it works for any elements with dimensions defined relative to font size (eg. `width: 1em`).
 
-<img src="./multi-line.gif" width="300" />
-<img src="./single-line.gif" width="300" />
+<img src="./assets/multi-line.gif" width="300" />
+<img src="./assets/single-line.gif" width="300" />
 
-[**Live demo**](todo:codesandbox)
+[**Live demo**](TODO)
 
 ## React component `AutoFit`
 
-The `AutoFit` component automatically re-runs when `children` changes or when the browser resizes.
+The `AutoFit` component automatically re-runs when `children` changes and when the browser resizes.
 
 ```tsx
 import { AutoFit } from 'auto-fit'
@@ -29,6 +29,7 @@ export const Title = ({ text }) => {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `children` | `ReactNode` | | The content to be auto fitted. |
 | `multiline` | `boolean` | `false` | Allow text to wrap and fit into both container width and height. |
 | `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
@@ -38,7 +39,7 @@ export const Title = ({ text }) => {
 
 ## Low-level `autoFit` function
 
-The `autoFit` function is used by the `AutoFit` component.
+The `autoFit` function is used by the `AutoFit` component. It has no dependencies.
 
 ```ts
 import { autoFit } from 'auto-fit'
@@ -50,8 +51,37 @@ autoFit(options)
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `innerEl` | `HTMLElement` | | The inner element to be auto fitted. |
 | `containerEl` | `HTMLElement` | | The container element is used as bounding box for the inner element. |
-| `innerEl` | `HTMLElement` | | The inner element receives the adjusted font size. |
 | `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
 | `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
+
+
+## Developing
+
+Because of [this](https://github.com/facebook/react/issues/14257), we use [Yalc](https://github.com/wclr/yalc) rather than `yarn link`. A linking approach is preferred over yarn workspaces since we want to run the package as it would appear in the real world.
+
+```sh
+npm i yalc -g
+yarn
+yarn watch
+
+# Other terminal
+cd example
+yarn
+yalc add --link auto-fit
+yarn dev
+```
+
+### Notes on Yalc
+
+Using `--link` makes it so that Next.js can HMR the updates instantly. It creates a `link:` rather than a `file:` dependency.
+
+### Publishing
+
+```sh
+# Bump version number
+yarn clean && yarn build
+npm publish
+```
