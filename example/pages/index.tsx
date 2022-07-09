@@ -67,7 +67,6 @@ export default function Page() {
 
       <div style={{ ...containerStyle, height: "unset" }}>
         <AutoFit
-          ellipsis
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
@@ -90,7 +89,6 @@ export default function Page() {
         <AutoFit
           multiline
           as="em"
-          ellipsis
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
@@ -123,7 +121,7 @@ export default function Page() {
         <>
           {demoMultiline}
           {demoSingleLine}
-          {demoAdvanced}
+          {/* {demoAdvanced} */}
         </>
       )}
     </div>

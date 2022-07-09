@@ -31,7 +31,6 @@ export const Title = ({ text }) => {
 | --- | --- | --- | --- |
 | `children` | `ReactNode` | | The content to be auto fitted. |
 | `multiline` | `boolean` | `false` | Allow text to wrap and fit into both container width and height. |
-| `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
 | `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
 | `as` | `string \| ReactComponent` | `'div'` | The underlying component that `AutoFit` will use. |
@@ -53,9 +52,14 @@ autoFit(options)
 | --- | --- | --- | --- |
 | `innerEl` | `HTMLElement` | | The inner element to be auto fitted. |
 | `containerEl` | `HTMLElement` | | The container element is used as bounding box for the inner element. |
-| `ellipsis` | `boolean` | `false` | Show ellipsis (...) if text overflows horizontally due to reaching `minFontSizePx`. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
 | `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
+
+
+## Notes on the algorithm
+
+* The algorithm is an optimization algorithm that minimizes the overflow of the inner element relative to the container element. It is not possible to exactly predict how a browser will render text in a different font size, so the algorithm makes the best guess and iterates until convergence (usually 1-2 iterations).
+* The algorithm uses font size rather than transform scale since the latter doesn't support multiline. Transform scale would work for singleline but we prefer to keep the two modes similar. Furthermore transform scale tends to make text blurry in some browsers.
 
 
 ## Developing

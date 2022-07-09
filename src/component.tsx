@@ -33,7 +33,6 @@ function throttleToNextFrame(func: () => void): () => void {
  */
 export function AutoFit({
   multiline,
-  ellipsis,
   maxFontSizePx,
   minFontSizePx,
   as: Comp = "div", // TODO: The `...rest` props are not typed to reflect another `as`.
@@ -53,12 +52,11 @@ export function AutoFit({
         innerEl: ref.current,
         containerEl: ref.current?.parentElement,
         multiline,
-        ellipsis,
         maxFontSizePx,
         minFontSizePx,
       })
     );
-  }, [ellipsis, maxFontSizePx, minFontSizePx, multiline]);
+  }, [maxFontSizePx, minFontSizePx, multiline]);
 
   useEffect(throttledAutoFit, [children, throttledAutoFit]);
 
