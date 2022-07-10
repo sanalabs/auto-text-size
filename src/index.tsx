@@ -1,2 +1,4 @@
-export { autoFit } from './function'
-export { AutoFit } from './component'
+export { AutoFit } from "./component";
+export { autoFit } from "./function";
+export { throttleAnimationFrame } from "./throttle-animation-frame";
+

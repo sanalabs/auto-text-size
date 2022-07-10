@@ -45,6 +45,16 @@ import { autoFit } from 'auto-fit'
 autoFit(options)
 ```
 
+If you have many elements or re-run `autoFit` frequently, throttle is good for performance:
+
+```ts
+import { autoFit, throttleAnimationFrame } from 'auto-fit'
+
+const throttledAutoFit = throttleAnimationFrame(() => autoFit(options))
+
+throttledAutoFit() // Subsequent calls are reasonably throttled
+```
+
 ### `autoFit` options
 
 | Name | Type | Default | Description |

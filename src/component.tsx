@@ -7,28 +7,7 @@ import React, {
   useRef,
 } from "react";
 import { autoFit, Options } from "./function";
-
-/**
- * Ensures that `func` is not called more than once per animation frame.
- *
- * Using requestAnimationFrame in this way ensures that we render as often as
- * possible without excessively blocking the UI.
- */
-function throttleToNextFrame(func: () => void): () => void {
-  let wait = false;
-
-  return () => {
-    if (!wait) {
-      wait = true;
-      requestAnimationFrame(() => {
-        func();
-        wait = false;
-      });
-    } else {
-      console.debug("AutoFit throttling to next animation frame");
-    }
-  };
-}
+import { throttleAnimationFrame } from "./throttle-animation-frame";
 
 /**
  * Adjusts the font size so that the content fits its container.
@@ -50,7 +29,7 @@ export function AutoFit({
 
   const throttledAutoFit = useMemo(
     () =>
-      throttleToNextFrame(() =>
+      throttleAnimationFrame(() =>
         autoFit({
           innerEl: ref.current,
           containerEl: ref.current?.parentElement,
