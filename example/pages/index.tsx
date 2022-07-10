@@ -45,7 +45,7 @@ export default function Page() {
     </>
   );
 
-  let demoMultiline = (
+  let demo = (
     <>
       <p>
         Multiline (text fits both the width and the height of the container):
@@ -62,11 +62,7 @@ export default function Page() {
       </div>
 
       <hr />
-    </>
-  );
 
-  let demoSingleLine = (
-    <>
       <p>
         Single line (text fits the width of the container but grows freely in
         size, up to maxFontSizePx):
@@ -82,11 +78,7 @@ export default function Page() {
       </div>
 
       <hr />
-    </>
-  );
 
-  let demoAdvanced = (
-    <>
       <p>
         Advanced (it works with any font variations and anything sized relative
         to font size):
@@ -124,13 +116,7 @@ export default function Page() {
   return (
     <div style={{ margin: "1rem" }}>
       {config}
-      {warn || (
-        <>
-          {demoMultiline}
-          {demoSingleLine}
-          {demoAdvanced}
-        </>
-      )}
+      {warn || demo}
     </div>
   );
 }
