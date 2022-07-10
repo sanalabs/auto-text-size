@@ -24,6 +24,8 @@ function throttleToNextFrame(func: () => void): () => void {
         func();
         wait = false;
       });
+    } else {
+      console.debug("AutoFit throttling to next animation frame");
     }
   };
 }
@@ -46,17 +48,19 @@ export function AutoFit({
   >): ReactElement {
   const ref = useRef<HTMLInputElement>(null);
 
-  const throttledAutoFit = useMemo(() => {
-    return throttleToNextFrame(() =>
-      autoFit({
-        innerEl: ref.current,
-        containerEl: ref.current?.parentElement,
-        multiline,
-        maxFontSizePx,
-        minFontSizePx,
-      })
-    );
-  }, [maxFontSizePx, minFontSizePx, multiline]);
+  const throttledAutoFit = useMemo(
+    () =>
+      throttleToNextFrame(() =>
+        autoFit({
+          innerEl: ref.current,
+          containerEl: ref.current?.parentElement,
+          multiline,
+          maxFontSizePx,
+          minFontSizePx,
+        })
+      ),
+    [maxFontSizePx, minFontSizePx, multiline]
+  );
 
   useEffect(throttledAutoFit, [children, throttledAutoFit]);
 

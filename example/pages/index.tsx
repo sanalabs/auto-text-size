@@ -3,14 +3,16 @@ import { useState } from "react";
 
 const containerStyle = {
   width: "50%",
+  maxWidth: "400px",
   height: "100px",
   border: "1px dashed #555",
+  outline: "none",
 };
 
 export default function Page() {
   const [text, setText] = useState("Demo text");
   const [minFontSizePx, setMinFontSizePx] = useState("8");
-  const [maxFontSizePx, setMaxFontSizePx] = useState("200");
+  const [maxFontSizePx, setMaxFontSizePx] = useState("160");
 
   const parsedMinFontSizePx = parseInt(minFontSizePx);
   const parsedMaxFontSizePx = parseInt(maxFontSizePx);
@@ -45,7 +47,9 @@ export default function Page() {
 
   let demoMultiline = (
     <>
-      <p>Multiline:</p>
+      <p>
+        Multiline (text fits both the width and the height of the container):
+      </p>
 
       <div style={containerStyle}>
         <AutoFit
@@ -63,7 +67,10 @@ export default function Page() {
 
   let demoSingleLine = (
     <>
-      <p>Single line:</p>
+      <p>
+        Single line (text fits the width of the container but grows freely in
+        size, up to maxFontSizePx):
+      </p>
 
       <div style={{ ...containerStyle, height: "unset" }}>
         <AutoFit
@@ -121,7 +128,7 @@ export default function Page() {
         <>
           {demoMultiline}
           {demoSingleLine}
-          {/* {demoAdvanced} */}
+          {demoAdvanced}
         </>
       )}
     </div>

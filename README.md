@@ -32,13 +32,12 @@ export const Title = ({ text }) => {
 | `children` | `ReactNode` | | The content to be auto fitted. |
 | `multiline` | `boolean` | `false` | Allow text to wrap and fit into both container width and height. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
-| `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
+| `maxFontSizePx` | `number` | `160` | The largest font size the algorithm will use. |
 | `as` | `string \| ReactComponent` | `'div'` | The underlying component that `AutoFit` will use. |
-
 
 ## Low-level `autoFit` function
 
-The `autoFit` function is used by the `AutoFit` component. It has no dependencies.
+For advanced use cases, the `autoFit` function may be useful. It is used by the `AutoFit` component and has no dependencies.
 
 ```ts
 import { autoFit } from 'auto-fit'
@@ -53,14 +52,15 @@ autoFit(options)
 | `innerEl` | `HTMLElement` | | The inner element to be auto fitted. |
 | `containerEl` | `HTMLElement` | | The container element is used as bounding box for the inner element. |
 | `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
-| `maxFontSizePx` | `number` | `200` | The largest font size the algorithm will use. |
+| `maxFontSizePx` | `number` | `160` | The largest font size the algorithm will use. |
 
+## Details
 
-## Notes on the algorithm
-
-* The algorithm is an optimization algorithm that minimizes the overflow of the inner element relative to the container element. It is not possible to exactly predict how a browser will render text in a different font size, so the algorithm makes the best guess and iterates until convergence (usually 1-2 iterations).
-* The algorithm uses font size rather than transform scale since the latter doesn't support multiline. Transform scale would work for singleline but we prefer to keep the two modes similar. Furthermore transform scale tends to make text blurry in some browsers.
-
+* **The single-line algorithm** predicts how the browser will render text in a different font size and iterates until converging with an error of <= 0.1px (usually 1-2 iterations).
+* **The multi-line algorithm** performs a binary search among the possible font sizes until converging with an error of <= 0.1px (usually ~10 iterations). There is no reliable way of predicting how the browser will render text in a different font size when multi-line text wrap is at play.
+* **Performance** Each iteration has a performance hit. `AutoFit` uses `requestAnimationFrame` to throttle repeated calls, ensuring that we render as often as possible without excessively blocking the UI.
+* **No overflow**. After usual iteration, the algorithms runs a second loop to ensure that no overflow occurs. Underflow is preferred since it doesn't look visually broken like overflow does.
+* **Font size** is used rather than transform scale since the latter wouldn't support multi-line text wrap. Transform scale would work for singleline but we prefer to keep the two modes similar. Furthermore, transform scale tends to make text blurry in some browsers.
 
 ## Developing
 

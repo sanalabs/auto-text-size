@@ -1,5 +1,3 @@
-import { CSSProperties } from "react";
-
 type AlgoOpts = {
   innerEl: HTMLElement;
   containerEl: HTMLElement;
@@ -20,7 +18,7 @@ const singlelineAlgo = ({
   const maxIterCount = 10;
   let iterCount = 0;
   let prevOverflowFactor = 1;
-  let updatePx: number | undefined = undefined;
+  const precisionPx = 0.1;
 
   while (iterCount < maxIterCount) {
     const w0 = innerEl.scrollWidth;
@@ -31,8 +29,6 @@ const singlelineAlgo = ({
 
     const overflowFactor = w0 / w1;
 
-    // console.log({ w0, w1, canGrow, canShrink, overflowFactor })
-
     // The browser cannot render a difference based on the previous font size update
     if (prevOverflowFactor === overflowFactor) {
       break;
@@ -42,14 +38,12 @@ const singlelineAlgo = ({
       break;
     }
 
-    updatePx = fontSizePx / overflowFactor - fontSizePx;
-    // console.log(updatePx);
+    const updatePx = fontSizePx / overflowFactor - fontSizePx;
     const prevFontSizePx = fontSizePx;
     fontSizePx = updateFontSizePx(fontSizePx + updatePx);
 
     // Stop iterating when converging
-    if (Math.abs(fontSizePx - prevFontSizePx) < 0.1) {
-      // console.log(`Update size converged (${fontSizePx - prevFontSizePx})`);
+    if (Math.abs(fontSizePx - prevFontSizePx) <= precisionPx) {
       break;
     }
 
@@ -59,13 +53,12 @@ const singlelineAlgo = ({
 
   // Ensure no overflow. Some browsers (Safari) are not great with sub-pixel
   // font size, making it so that the overflow can be rather bad.
-  const overflowStepSize = Math.max(updatePx ?? 0.1, 0.1);
+  const overflowStepSize = 0.1;
   while (fontSizePx > minFontSizePx) {
     const w0 = innerEl.scrollWidth;
     const w1 = containerEl.clientWidth;
     if (w0 <= w1) break;
 
-    console.log("Anti-overflow", overflowStepSize);
     fontSizePx = updateFontSizePx(fontSizePx - overflowStepSize);
   }
 };
@@ -78,80 +71,46 @@ const multilineAlgo = ({
   maxFontSizePx,
   updateFontSizePx,
 }: AlgoOpts) => {
-  const maxIterCount = 10;
-  let iterCount = 0;
-  let prevOverflowFactor = 1;
-  let updatePx: number | undefined = undefined;
+  const decayFactor = 0.5; // Binary search. Don't change this number.
+  const precisionPx = 0.1;
+  let updatePx = maxFontSizePx - minFontSizePx;
 
-  while (iterCount < maxIterCount) {
+  while (updatePx > precisionPx) {
     const w0 = innerEl.scrollWidth;
     const w1 = containerEl.clientWidth;
 
     const h0 = innerEl.scrollHeight;
     const h1 = containerEl.clientHeight;
 
-    const wCanGrow = fontSizePx < maxFontSizePx && w0 < w1;
-    const wCanShrink = fontSizePx > minFontSizePx && w0 > w1;
+    if (w0 === w1 && h0 === h1) break;
 
-    const hCanGrow = fontSizePx < maxFontSizePx && h0 < h1;
-    const hCanShrink = fontSizePx > minFontSizePx && h0 > h1;
+    updatePx *= decayFactor; // The first jump should be 50% of the total distance.
 
-    // const wOverflowFactor = w0 / w1;
-    // const hOverflowFactor = h0 / h1;
-
-    const wErr = w0 / w1
-    const hErr = h0 / h1
-
-    // const err = (w1 - w0) * h1 + (h1 - h0) * w1
-    // const factor = err / (w1 * h1)
-    const factor = wErr * hErr
-
-    // console.log({ w0, w1, canGrow, canShrink, overflowFactor })
-
-    // The browser cannot render a difference based on the previous font size update
-    // if (prevOverflowFactor === wOverflowFactor) {
-    //   break;
-    // }
-
-    if (!(wCanGrow || wCanShrink || hCanGrow || hCanShrink)) {
-      break;
+    /**
+     * Use `<=` rather than `<` since equality is possible even though there is
+     * room for resizing in the other dimension.
+     */
+    if (fontSizePx < maxFontSizePx && w0 <= w1 && h0 <= h1) {
+      fontSizePx = updateFontSizePx(fontSizePx + updatePx);
+    } else if (fontSizePx > minFontSizePx && (w0 > w1 || h0 > h1)) {
+      fontSizePx = updateFontSizePx(fontSizePx - updatePx);
     }
-
-    updatePx = fontSizePx / factor - fontSizePx;
-
-    console.log({fontSizePx, factor, wErr, hErr })
-
-    const prevFontSizePx = fontSizePx;
-    fontSizePx = updateFontSizePx(fontSizePx + updatePx);
-
-    // Stop iterating when converging
-    if (Math.abs(fontSizePx - prevFontSizePx) < 0.1) {
-      // console.log(`Update size converged (${fontSizePx - prevFontSizePx})`);
-      break;
-    }
-
-    // prevOverflowFactor = wOverflowFactor;
-    iterCount++;
   }
 
   // Ensure no overflow. Some browsers (Safari) are not great with sub-pixel
   // font size, making it so that the overflow can be rather bad.
-  // const overflowStepSize = Math.max(updatePx ?? 0.1, 0.1);
-  // while (fontSizePx > minFontSizePx) {
-  //   const w0 = innerEl.scrollWidth;
-  //   const w1 = containerEl.clientWidth;
+  const overflowStepSize = 0.1;
+  while (fontSizePx > minFontSizePx) {
+    const w0 = innerEl.scrollWidth;
+    const w1 = containerEl.clientWidth;
 
-  //   const h0 = innerEl.scrollHeight;
-  //   const h1 = containerEl.clientHeight;
+    const h0 = innerEl.scrollHeight;
+    const h1 = containerEl.clientHeight;
 
-  //   const wOverflowFactor = w0 / w1;
-  //   const hOverflowFactor = h0 / h1;
+    if (w0 <= w1 && h0 <= h1) break;
 
-  //   if (w0 <= w1 && h0 <= h1) break;
-
-  //   console.log("Anti-overflow", wOverflowFactor, hOverflowFactor, overflowStepSize);
-  //   fontSizePx = updateFontSizePx(fontSizePx - overflowStepSize);
-  // }
+    fontSizePx = updateFontSizePx(fontSizePx - overflowStepSize);
+  }
 };
 
 export type Options = {
@@ -168,11 +127,13 @@ export function autoFit({
   containerEl,
   multiline,
   minFontSizePx = 8,
-  maxFontSizePx = 200,
+  maxFontSizePx = 160,
 }: Options & {
   innerEl: HTMLElement | undefined | null;
   containerEl: HTMLElement | undefined | null;
 }): void {
+  const t0 = performance.now();
+
   if (!innerEl || !containerEl) return;
 
   if (containerEl.children.length > 1) {
@@ -183,13 +144,13 @@ export function autoFit({
     );
   }
 
-  const containerStyles: CSSProperties = {
-    // This allows proper computation of the dimensions `innerEl`.
+  const containerStyles: Partial<CSSStyleDeclaration> = {
+    // Necessary to correctly compute the dimensions `innerEl`.
     display: "flex",
     alignItems: "start",
   };
 
-  const innerStyles: CSSProperties = {
+  const innerStyles: Partial<CSSStyleDeclaration> = {
     display: "block", // Necessary to compute dimensions.
   };
 
@@ -205,8 +166,6 @@ export function autoFit({
 
   Object.assign(containerEl.style, containerStyles);
   Object.assign(innerEl.style, innerStyles);
-
-  const fontSizeAdjustmentFactor = 1.05;
 
   const fontSizeStr = window
     .getComputedStyle(innerEl, null)
@@ -228,16 +187,7 @@ export function autoFit({
     return fontSizePx;
   };
 
-  if (!multiline) {
-    singlelineAlgo({
-      innerEl,
-      containerEl,
-      fontSizePx,
-      minFontSizePx,
-      maxFontSizePx,
-      updateFontSizePx,
-    });
-  } else {
+  if (multiline) {
     multilineAlgo({
       innerEl,
       containerEl,
@@ -246,32 +196,22 @@ export function autoFit({
       maxFontSizePx,
       updateFontSizePx,
     });
-
-    // /**
-    //  * Multiline has more edge cases than single line.
-    //  *
-    //  * Must use `>=` rather than `>` since the element `innerEl` can have
-    //  * `innerEl.scrollWidth === containerEl.scrollWidth` even though there is
-    //  * room for resizing.
-    //  */
-    // while (
-    //   innerEl.scrollWidth <= containerEl.clientWidth &&
-    //   innerEl.scrollHeight <= containerEl.clientHeight &&
-    //   fontSizePx < maxFontSizePx
-    // ) {
-    //   updateFontSizePx(fontSizePx * fontSizeAdjustmentFactor);
-    // }
-
-    // // Must use `>` rather than `>=` since the width can be max for long text,
-    // // wich would case the loop to run until minFontSize is reached
-    // while (
-    //   (innerEl.scrollWidth > containerEl.clientWidth ||
-    //     innerEl.scrollHeight > containerEl.clientHeight) &&
-    //   fontSizePx > minFontSizePx
-    // ) {
-    //   updateFontSizePx(fontSizePx / fontSizeAdjustmentFactor);
-    // }
+  } else {
+    singlelineAlgo({
+      innerEl,
+      containerEl,
+      fontSizePx,
+      minFontSizePx,
+      maxFontSizePx,
+      updateFontSizePx,
+    });
   }
 
-  console.debug(`AutoFit ran ${iterations} iterations`);
+  const t1 = performance.now();
+
+  console.debug(
+    `AutoFit ${
+      multiline ? "multiline" : "singleline"
+    } ran ${iterations} iterations in ${Math.round(t1 - t0)}ms`
+  );
 }
