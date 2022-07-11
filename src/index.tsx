@@ -1,4 +1,2 @@
-export { AutoFit } from "./component";
-export { autoFit } from "./function";
-export { throttleAnimationFrame } from "./throttle-animation-frame";
-
+export { autoTextSize } from "./auto-text-size-standalone";
+export { AutoTextSize } from "./auto-text-size-react";

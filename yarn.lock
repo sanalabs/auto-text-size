@@ -44,9 +44,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"auto-fit@workspace:.":
+"auto-text-size@workspace:.":
   version: 0.0.0-use.local
-  resolution: "auto-fit@workspace:."
+  resolution: "auto-text-size@workspace:."
   dependencies:
     "@types/node": 18.0.3
     "@types/react": 18.0.15

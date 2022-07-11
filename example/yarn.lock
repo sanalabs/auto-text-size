@@ -433,11 +433,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"auto-fit@link:.yalc/auto-fit::locator=example%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "auto-fit@link:.yalc/auto-fit::locator=example%40workspace%3A."
+"auto-text-size@npm:*":
+  version: 0.1.0
+  resolution: "auto-text-size@npm:0.1.0"
+  peerDependencies:
+    react: "*"
+  checksum: 0d167ba80b09271251c88f15ed0268ce454d714287b5e33ac9686b5612b4e491c49970ae561f473b034c2ef64df45f1eec6329bb727209caacede3012e4e5075
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "axe-core@npm:^4.4.2":
   version: 4.4.2
@@ -975,7 +978,7 @@ __metadata:
     "@types/node": 18.0.3
     "@types/react": 18.0.15
     "@types/react-dom": 18.0.6
-    auto-fit: "link:.yalc/auto-fit"
+    auto-text-size: "*"
     eslint: 8.19.0
     eslint-config-next: 12.2.0
     next: 12.2.0

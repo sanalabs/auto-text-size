@@ -1,4 +1,4 @@
-import { AutoFit } from "auto-fit";
+import { AutoTextSize } from "auto-text-size";
 import { useState } from "react";
 
 const containerStyle = {
@@ -7,10 +7,11 @@ const containerStyle = {
   height: "100px",
   border: "1px dashed #555",
   outline: "none",
+  lineHeight: "1",
 };
 
 export default function Page() {
-  const [text, setText] = useState("Demo text");
+  const [text, setText] = useState("Lorem ipsum dolor sit amet");
   const [minFontSizePx, setMinFontSizePx] = useState("8");
   const [maxFontSizePx, setMaxFontSizePx] = useState("160");
 
@@ -19,7 +20,10 @@ export default function Page() {
 
   const config = (
     <>
-      <p>This is a demo of AutoFit. See the docs.</p>
+      <p>
+        This is a demo of AutoTextSize. See the{" "}
+        <a href="https://github.com/sanalabs/auto-text-size">docs</a>.
+      </p>
 
       <h3>Config</h3>
       <p>
@@ -41,70 +45,41 @@ export default function Page() {
         <textarea value={text} onChange={(e) => setText(e.target.value)} />
       </p>
 
-      <hr />
+      <hr style={{ margin: "1rem 0" }} />
     </>
   );
 
   let demo = (
     <>
       <p>
-        Multiline (text fits both the width and the height of the container):
-      </p>
-
-      <div style={containerStyle}>
-        <AutoFit
-          multiline
-          minFontSizePx={parsedMinFontSizePx}
-          maxFontSizePx={parsedMaxFontSizePx}
-        >
-          {text}
-        </AutoFit>
-      </div>
-
-      <hr />
-
-      <p>
-        Single line (text fits the width of the container but grows freely in
-        size, up to maxFontSizePx):
+        <strong>Single-line.</strong> Text fills the width of the container,
+        without wrapping to more than one line.
       </p>
 
       <div style={{ ...containerStyle, height: "unset" }}>
-        <AutoFit
+        <AutoTextSize
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
           {text}
-        </AutoFit>
+        </AutoTextSize>
       </div>
 
-      <hr />
+      <hr style={{ margin: "1rem 0" }} />
 
       <p>
-        Advanced (it works with any font variations and anything sized relative
-        to font size):
+        <strong>Multi-line.</strong> Text fills both the width and the height of
+        the container, allowing wrapping to multiple lines.
       </p>
 
-      <div style={{ ...containerStyle, height: 150 }}>
-        <AutoFit
+      <div style={containerStyle}>
+        <AutoTextSize
           multiline
-          as="em"
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
         >
           {text}
-          <span style={{ color: "#fba", fontSize: "1.5em" }}> 1.5em</span>
-          <span style={{ color: "#fba", fontSize: "0.75em" }}> 0.75em</span>
-          <strong style={{ color: "#fba", fontSize: "1.5rem" }}> 1.5rem</strong>
-          <span
-            style={{
-              display: "inline-block",
-              backgroundColor: "#fba",
-              width: "1em",
-              height: "1em",
-              marginLeft: "0.5em",
-            }}
-          />
-        </AutoFit>
+        </AutoTextSize>
       </div>
     </>
   );

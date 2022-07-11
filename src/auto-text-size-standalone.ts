@@ -1,3 +1,23 @@
+/**
+ * Ensures that `func` is not called more than once per animation frame.
+ *
+ * Using requestAnimationFrame in this way ensures that we render as often as
+ * possible without excessively blocking the UI.
+ */
+function throttleAnimationFrame(func: () => void): () => void {
+  let wait = false;
+
+  return () => {
+    if (!wait) {
+      wait = true;
+      requestAnimationFrame(() => {
+        func();
+        wait = false;
+      });
+    }
+  };
+}
+
 type AlgoOpts = {
   innerEl: HTMLElement;
   containerEl: HTMLElement;
@@ -120,27 +140,27 @@ export type Options = {
 };
 
 /**
- * Adjusts the font size of `innerEl` so that it fits `containerEl`.
+ * Make text fit container, prevent overflow and underflow.
+ *
+ * Adjusts the font size of `innerEl` so that it precisely fills `containerEl`.
  */
-export function autoFit({
+export function autoTextSize({
   innerEl,
   containerEl,
   multiline,
   minFontSizePx = 8,
   maxFontSizePx = 160,
 }: Options & {
-  innerEl: HTMLElement | undefined | null;
-  containerEl: HTMLElement | undefined | null;
+  innerEl: HTMLElement;
+  containerEl: HTMLElement;
 }): void {
   const t0 = performance.now();
 
-  if (!innerEl || !containerEl) return;
-
   if (containerEl.children.length > 1) {
     console.warn(
-      `AutoSizeText has ${
+      `AutoTextSize has ${
         containerEl.children.length - 1
-      } siblings. This may interfere with the auto-size algorithm.`
+      } siblings. This may interfere with the algorithm.`
     );
   }
 
@@ -171,7 +191,6 @@ export function autoFit({
     .getComputedStyle(innerEl, null)
     .getPropertyValue("font-size");
   let fontSizePx = parseFloat(fontSizeStr);
-
   let iterations = 0;
 
   const updateFontSizePx = (px: number): number => {
@@ -186,6 +205,10 @@ export function autoFit({
     iterations++;
     return fontSizePx;
   };
+
+  if (fontSizePx > maxFontSizePx || fontSizePx < minFontSizePx) {
+    updateFontSizePx(fontSizePx)
+  }
 
   if (multiline) {
     multilineAlgo({
@@ -210,8 +233,68 @@ export function autoFit({
   const t1 = performance.now();
 
   console.debug(
-    `AutoFit ${
+    `AutoTextSize ${
       multiline ? "multiline" : "singleline"
     } ran ${iterations} iterations in ${Math.round(t1 - t0)}ms`
   );
+}
+
+type DisconnectableFunction = {
+  (): void;
+  disconnect: () => void;
+};
+
+/**
+ * Make text fit container, prevent overflow and underflow.
+ *
+ * Adjusts the font size of `innerEl` so that it precisely fills `containerEl`.
+ * Throttles all invocations to next animation frame (through
+ * `requestAnimationFrame`). Sets up a `ResizeObserver` to automatically run
+ * `autoTextSize` when `containerEl` resizes. Call `disconnect()` when done to
+ * disconnect the resize observer to prevent memory leaks.
+ */
+export function autoTextSizeWithResizeObserver({
+  innerEl,
+  containerEl,
+  multiline,
+  minFontSizePx = 8,
+  maxFontSizePx = 160,
+}: Options & {
+  innerEl: HTMLElement;
+  containerEl: HTMLElement;
+}): DisconnectableFunction {
+  let containerDimensions: [number, number] | undefined = undefined; // Always run when instantiating.
+
+  const throttledAutoTextSize: any = throttleAnimationFrame(() => {
+    autoTextSize({
+      innerEl,
+      containerEl,
+      multiline,
+      maxFontSizePx,
+      minFontSizePx,
+    });
+
+    containerDimensions = [containerEl.clientWidth, containerEl.clientHeight];
+  });
+
+  const resizeObserver = new ResizeObserver(() => {
+    const prevContainerDimensions = containerDimensions;
+    containerDimensions = [containerEl.clientWidth, containerEl.clientHeight];
+
+    if (
+      prevContainerDimensions?.[0] !== containerDimensions[0] ||
+      prevContainerDimensions?.[1] !== containerDimensions[1]
+    ) {
+      throttledAutoTextSize();
+    }
+  });
+
+  resizeObserver.observe(containerEl);
+
+  // The native code `resizeObserver.disconnect` needs the correct context.
+  // Retain the context by wrapping in arrow function. Read more about this:
+  // https://stackoverflow.com/a/9678166/19306180
+  throttledAutoTextSize.disconnect = () => resizeObserver.disconnect();
+
+  return throttledAutoTextSize;
 }

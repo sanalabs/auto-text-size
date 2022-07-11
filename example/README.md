@@ -1,3 +1,3 @@
-# AutoFit demo app
+# AutoTextSize demo app
 
 [**Live demo**](TODO)
