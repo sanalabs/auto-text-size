@@ -1,2 +1,2 @@
-export { autoTextSize } from "./auto-text-size-standalone";
+export { autoTextSize, updateTextSize } from "./auto-text-size-standalone";
 export { AutoTextSize } from "./auto-text-size-react";

@@ -14,9 +14,11 @@ export default function Page() {
   const [text, setText] = useState("Lorem ipsum dolor sit amet");
   const [minFontSizePx, setMinFontSizePx] = useState("8");
   const [maxFontSizePx, setMaxFontSizePx] = useState("160");
+  const [fontSizePrecisionPx, setFontSizePrecisionPx] = useState("0.1");
 
-  const parsedMinFontSizePx = parseInt(minFontSizePx);
-  const parsedMaxFontSizePx = parseInt(maxFontSizePx);
+  const parsedMinFontSizePx = parseFloat(minFontSizePx);
+  const parsedMaxFontSizePx = parseFloat(maxFontSizePx);
+  const parsedFontSizePrecisionPx = parseFloat(fontSizePrecisionPx);
 
   const config = (
     <>
@@ -41,6 +43,13 @@ export default function Page() {
         />
       </p>
       <p>
+        fontSizePrecisionPx:{" "}
+        <input
+          value={fontSizePrecisionPx}
+          onChange={(e) => setFontSizePrecisionPx(e.target.value)}
+        />
+      </p>
+      <p>
         Text:{" "}
         <textarea value={text} onChange={(e) => setText(e.target.value)} />
       </p>
@@ -60,6 +69,7 @@ export default function Page() {
         <AutoTextSize
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
+          fontSizePrecisionPx={parsedFontSizePrecisionPx}
         >
           {text}
         </AutoTextSize>
@@ -77,6 +87,7 @@ export default function Page() {
           multiline
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
+          fontSizePrecisionPx={parsedFontSizePrecisionPx}
         >
           {text}
         </AutoTextSize>
@@ -87,6 +98,8 @@ export default function Page() {
   let warn = undefined;
   if (!isFinite(parsedMinFontSizePx)) warn = <>Invalid minFontSizePx</>;
   if (!isFinite(parsedMaxFontSizePx)) warn = <>Invalid maxFontSizePx</>;
+  if (!isFinite(parsedFontSizePrecisionPx) || parsedFontSizePrecisionPx === 0)
+    warn = <>Invalid fontSizePrecisionPx</>;
 
   return (
     <div style={{ margin: "1rem" }}>

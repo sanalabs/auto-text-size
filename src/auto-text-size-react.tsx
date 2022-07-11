@@ -6,18 +6,16 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import {
-  autoTextSizeWithResizeObserver,
-  Options,
-} from "./auto-text-size-standalone";
+import { autoTextSize, Options } from "./auto-text-size-standalone";
 
 /**
  * Make text fit container, prevent overflow and underflow.
  */
 export function AutoTextSize({
   multiline,
-  maxFontSizePx,
   minFontSizePx,
+  maxFontSizePx,
+  fontSizePrecisionPx,
   as: Comp = "div", // TODO: The `...rest` props are not typed to reflect another `as`.
   children,
   ...rest
@@ -27,26 +25,27 @@ export function AutoTextSize({
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >): ReactElement {
-  const funcRef = useRef<ReturnType<typeof autoTextSizeWithResizeObserver>>();
+  const updateTextSizeRef = useRef<ReturnType<typeof autoTextSize>>();
 
-  useEffect(() => funcRef.current?.(), [children]);
+  useEffect(() => updateTextSizeRef.current?.(), [children]);
 
   const refCallback = useCallback(
     (innerEl: HTMLElement | null) => {
-      funcRef.current?.disconnect();
+      updateTextSizeRef.current?.disconnect();
 
       const containerEl = innerEl?.parentElement;
       if (!innerEl || !containerEl) return;
 
-      funcRef.current = autoTextSizeWithResizeObserver({
+      updateTextSizeRef.current = autoTextSize({
         innerEl,
         containerEl,
         multiline,
-        maxFontSizePx,
         minFontSizePx,
+        maxFontSizePx,
+        fontSizePrecisionPx,
       });
     },
-    [maxFontSizePx, minFontSizePx, multiline]
+    [multiline, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
   );
 
   return (

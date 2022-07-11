@@ -24,7 +24,53 @@ type AlgoOpts = {
   fontSizePx: number;
   minFontSizePx: number;
   maxFontSizePx: number;
+  fontSizePrecisionPx: number;
   updateFontSizePx: (px: number) => number;
+};
+
+/**
+ * Ensure no overflow. Underflow is preferred since it doesn't look visually
+ * broken like overflow does.
+ *
+ * Some browsers (Safari) are not good with sub-pixel font sizing, making it so
+ * that visual overflow can occur unless we adjust for it.
+ */
+const antiOverflowAlgo = ({
+  fontSizePx,
+  minFontSizePx,
+  fontSizePrecisionPx,
+  updateFontSizePx,
+  breakPredicate: breakPred,
+}: Pick<
+  AlgoOpts,
+  "fontSizePx" | "minFontSizePx" | "fontSizePrecisionPx" | "updateFontSizePx"
+> & { breakPredicate: () => boolean }): void => {
+  const maxIterCount = 1 / fontSizePrecisionPx;
+  let iterCount = 0;
+
+  while (fontSizePx > minFontSizePx && iterCount < maxIterCount) {
+    if (breakPred()) break;
+    fontSizePx = updateFontSizePx(fontSizePx - fontSizePrecisionPx);
+    iterCount++;
+  }
+};
+
+const getContentWidth = (element: HTMLElement): number => {
+  const computedStyle = getComputedStyle(element);
+  return (
+    element.clientWidth -
+    parseFloat(computedStyle.paddingLeft) -
+    parseFloat(computedStyle.paddingRight)
+  );
+};
+
+const getContentHeight = (element: HTMLElement): number => {
+  const computedStyle = getComputedStyle(element);
+  return (
+    element.clientHeight -
+    parseFloat(computedStyle.paddingTop) -
+    parseFloat(computedStyle.paddingBottom)
+  );
 };
 
 const singlelineAlgo = ({
@@ -33,16 +79,16 @@ const singlelineAlgo = ({
   fontSizePx,
   minFontSizePx,
   maxFontSizePx,
+  fontSizePrecisionPx,
   updateFontSizePx,
-}: AlgoOpts) => {
-  const maxIterCount = 10;
+}: AlgoOpts): void => {
+  const maxIterCount = 10; // Safety fallback to avoid infinite loop
   let iterCount = 0;
   let prevOverflowFactor = 1;
-  const precisionPx = 0.1;
 
   while (iterCount < maxIterCount) {
     const w0 = innerEl.scrollWidth;
-    const w1 = containerEl.clientWidth;
+    const w1 = getContentWidth(containerEl);
 
     const canGrow = fontSizePx < maxFontSizePx && w0 < w1;
     const canShrink = fontSizePx > minFontSizePx && w0 > w1;
@@ -63,7 +109,7 @@ const singlelineAlgo = ({
     fontSizePx = updateFontSizePx(fontSizePx + updatePx);
 
     // Stop iterating when converging
-    if (Math.abs(fontSizePx - prevFontSizePx) <= precisionPx) {
+    if (Math.abs(fontSizePx - prevFontSizePx) <= fontSizePrecisionPx) {
       break;
     }
 
@@ -71,16 +117,13 @@ const singlelineAlgo = ({
     iterCount++;
   }
 
-  // Ensure no overflow. Some browsers (Safari) are not great with sub-pixel
-  // font size, making it so that the overflow can be rather bad.
-  const overflowStepSize = 0.1;
-  while (fontSizePx > minFontSizePx) {
-    const w0 = innerEl.scrollWidth;
-    const w1 = containerEl.clientWidth;
-    if (w0 <= w1) break;
-
-    fontSizePx = updateFontSizePx(fontSizePx - overflowStepSize);
-  }
+  antiOverflowAlgo({
+    fontSizePx,
+    minFontSizePx,
+    updateFontSizePx,
+    fontSizePrecisionPx,
+    breakPredicate: () => innerEl.scrollWidth <= getContentWidth(containerEl),
+  });
 };
 
 const multilineAlgo = ({
@@ -89,18 +132,20 @@ const multilineAlgo = ({
   fontSizePx,
   minFontSizePx,
   maxFontSizePx,
+  fontSizePrecisionPx,
   updateFontSizePx,
 }: AlgoOpts) => {
+  const maxIterCount = 100; // Safety fallback to avoid infinite loop
   const decayFactor = 0.5; // Binary search. Don't change this number.
-  const precisionPx = 0.1;
   let updatePx = maxFontSizePx - minFontSizePx;
+  let iterCount = 0;
 
-  while (updatePx > precisionPx) {
+  while (updatePx > fontSizePrecisionPx && iterCount < maxIterCount) {
     const w0 = innerEl.scrollWidth;
-    const w1 = containerEl.clientWidth;
+    const w1 = getContentWidth(containerEl);
 
     const h0 = innerEl.scrollHeight;
-    const h1 = containerEl.clientHeight;
+    const h1 = getContentHeight(containerEl);
 
     if (w0 === w1 && h0 === h1) break;
 
@@ -115,28 +160,26 @@ const multilineAlgo = ({
     } else if (fontSizePx > minFontSizePx && (w0 > w1 || h0 > h1)) {
       fontSizePx = updateFontSizePx(fontSizePx - updatePx);
     }
+
+    iterCount++;
   }
 
-  // Ensure no overflow. Some browsers (Safari) are not great with sub-pixel
-  // font size, making it so that the overflow can be rather bad.
-  const overflowStepSize = 0.1;
-  while (fontSizePx > minFontSizePx) {
-    const w0 = innerEl.scrollWidth;
-    const w1 = containerEl.clientWidth;
-
-    const h0 = innerEl.scrollHeight;
-    const h1 = containerEl.clientHeight;
-
-    if (w0 <= w1 && h0 <= h1) break;
-
-    fontSizePx = updateFontSizePx(fontSizePx - overflowStepSize);
-  }
+  antiOverflowAlgo({
+    fontSizePx,
+    minFontSizePx,
+    updateFontSizePx,
+    fontSizePrecisionPx,
+    breakPredicate: () =>
+      innerEl.scrollWidth <= getContentWidth(containerEl) &&
+      innerEl.scrollHeight <= getContentHeight(containerEl),
+  });
 };
 
 export type Options = {
   multiline?: boolean | undefined;
   minFontSizePx?: number | undefined;
   maxFontSizePx?: number | undefined;
+  fontSizePrecisionPx?: number | undefined;
 };
 
 /**
@@ -144,17 +187,30 @@ export type Options = {
  *
  * Adjusts the font size of `innerEl` so that it precisely fills `containerEl`.
  */
-export function autoTextSize({
+export function updateTextSize({
   innerEl,
   containerEl,
   multiline,
   minFontSizePx = 8,
   maxFontSizePx = 160,
+  fontSizePrecisionPx = 0.1,
 }: Options & {
   innerEl: HTMLElement;
   containerEl: HTMLElement;
 }): void {
   const t0 = performance.now();
+
+  if (!isFinite(minFontSizePx)) {
+    throw new Error(`Invalid minFontSizePx (${minFontSizePx})`);
+  }
+
+  if (!isFinite(minFontSizePx)) {
+    throw new Error(`Invalid maxFontSizePx (${maxFontSizePx})`);
+  }
+
+  if (!isFinite(fontSizePrecisionPx) || fontSizePrecisionPx === 0) {
+    throw new Error(`Invalid fontSizePrecisionPx (${fontSizePrecisionPx})`);
+  }
 
   if (containerEl.children.length > 1) {
     console.warn(
@@ -207,7 +263,7 @@ export function autoTextSize({
   };
 
   if (fontSizePx > maxFontSizePx || fontSizePx < minFontSizePx) {
-    updateFontSizePx(fontSizePx)
+    updateFontSizePx(fontSizePx);
   }
 
   if (multiline) {
@@ -217,6 +273,7 @@ export function autoTextSize({
       fontSizePx,
       minFontSizePx,
       maxFontSizePx,
+      fontSizePrecisionPx,
       updateFontSizePx,
     });
   } else {
@@ -226,6 +283,7 @@ export function autoTextSize({
       fontSizePx,
       minFontSizePx,
       maxFontSizePx,
+      fontSizePrecisionPx,
       updateFontSizePx,
     });
   }
@@ -248,53 +306,67 @@ type DisconnectableFunction = {
  * Make text fit container, prevent overflow and underflow.
  *
  * Adjusts the font size of `innerEl` so that it precisely fills `containerEl`.
+ *
  * Throttles all invocations to next animation frame (through
- * `requestAnimationFrame`). Sets up a `ResizeObserver` to automatically run
- * `autoTextSize` when `containerEl` resizes. Call `disconnect()` when done to
- * disconnect the resize observer to prevent memory leaks.
+ * `requestAnimationFrame`).
+ *
+ * Sets up a `ResizeObserver` to automatically run `autoTextSize` when
+ * `containerEl` resizes. Call `disconnect()` when done to disconnect the resize
+ * observer to prevent memory leaks.
  */
-export function autoTextSizeWithResizeObserver({
+export function autoTextSize({
   innerEl,
   containerEl,
   multiline,
-  minFontSizePx = 8,
-  maxFontSizePx = 160,
+  minFontSizePx,
+  maxFontSizePx,
+  fontSizePrecisionPx,
 }: Options & {
   innerEl: HTMLElement;
   containerEl: HTMLElement;
 }): DisconnectableFunction {
-  let containerDimensions: [number, number] | undefined = undefined; // Always run when instantiating.
+  // Initialize as `undefined` to always run directly when instantiating.
+  let containerDimensions: [number, number] | undefined = undefined;
 
-  const throttledAutoTextSize: any = throttleAnimationFrame(() => {
-    autoTextSize({
+  // Use type `any` so that we can add the `.disconnect` property later on.
+  const throttledUpdateTextSize: any = throttleAnimationFrame(() => {
+    updateTextSize({
       innerEl,
       containerEl,
       multiline,
       maxFontSizePx,
       minFontSizePx,
+      fontSizePrecisionPx,
     });
 
-    containerDimensions = [containerEl.clientWidth, containerEl.clientHeight];
+    containerDimensions = [
+      getContentWidth(containerEl),
+      getContentHeight(containerEl),
+    ];
   });
 
   const resizeObserver = new ResizeObserver(() => {
     const prevContainerDimensions = containerDimensions;
-    containerDimensions = [containerEl.clientWidth, containerEl.clientHeight];
+    containerDimensions = [
+      getContentWidth(containerEl),
+      getContentHeight(containerEl),
+    ];
 
     if (
       prevContainerDimensions?.[0] !== containerDimensions[0] ||
       prevContainerDimensions?.[1] !== containerDimensions[1]
     ) {
-      throttledAutoTextSize();
+      throttledUpdateTextSize();
     }
   });
 
+  // It calls the callback directly.
   resizeObserver.observe(containerEl);
 
   // The native code `resizeObserver.disconnect` needs the correct context.
   // Retain the context by wrapping in arrow function. Read more about this:
   // https://stackoverflow.com/a/9678166/19306180
-  throttledAutoTextSize.disconnect = () => resizeObserver.disconnect();
+  throttledUpdateTextSize.disconnect = () => resizeObserver.disconnect();
 
-  return throttledAutoTextSize;
+  return throttledUpdateTextSize;
 }

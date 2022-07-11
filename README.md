@@ -6,19 +6,19 @@ The algorithm adjusts the font size of the text so that it precisely fills its c
 
 ## Single-line mode
 
-Text fills the width of the container, without wrapping to more than one line.
+The text fills the width of the container, without wrapping to more than one line.
 
 <img src="./assets/single-line.gif" width="300" />
 
 ## Multi-line mode
 
-Text fills both the width and the height of the container, allowing wrapping to multiple lines.
+The text fills both the width and the height of the container, allowing wrapping to multiple lines.
 
 <img src="./assets/multi-line.gif" width="300" />
 
 [**Live demo**](TODO)
 
-## React component `AutoTextSize`
+## React component
 
 The `AutoTextSize` component automatically re-runs when `children` changes and when the element resizes.
 
@@ -38,36 +38,37 @@ export const Title = ({ text }) => {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `children` | `ReactNode` | | The content to be auto sized. |
-| `multiline` | `boolean` | `false` | Allow text to wrap and fill container width and height. |
-| `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
-| `maxFontSizePx` | `number` | `160` | The largest font size the algorithm will use. |
+| `multiline` | `boolean` | `false` | Allow text to wrap to multiple lines. |
+| `minFontSizePx` | `number` | `8` | The minimum font size to be used. |
+| `maxFontSizePx` | `number` | `160` | The maximum font size to be used. |
+| `fontSizePrecisionPx` | `number` | `0.1` | The algorithm stops when reaching the precision. |
 | `as` | `string \| ReactComponent` | `'div'` | The underlying component that `AutoTextSize` will use. |
 
-## Low-level `autoTextSize` function
+## Vanilla function
 
-For advanced use cases, the `autoTextSize` and `autoTextSizeWithResizeObserver` function may be useful. The latter is used by the `AutoTextSize` component and has no dependencies.
-
-Simple:
+Zero dependencies.
 
 ```ts
 import { autoTextSize } from 'auto-text-size'
 
-autoTextSize(options)
+// autoTextSize runs the returned function directly and
+// re-runs it when the container element changes size.
+const updateTextSize = autoTextSize(options)
+
+// All invocations are throttled for performance. Manually
+// call this if the content changes and needs to re-adjust.
+updateTextSize()
+
+// Disconnect the resize observer when done.
+updateTextSize.disconnect()
 ```
 
-Robust:
+One-off use:
 
 ```ts
-import { autoTextSizeWithResizeObserver } from 'auto-text-size'
+import { updateTextSize } from 'auto-text-size'
 
-const func = autoTextSizeWithResizeObserver(options)
-
-func()
-// Subsequent calls are throttled for performance and
-// it automatically re-runs if the element resizes.
-
-func.disconnect() // Disconnect the resize observer when done.
+updateTextSize(options)
 ```
 
 ### `autoTextSize` options
@@ -75,18 +76,19 @@ func.disconnect() // Disconnect the resize observer when done.
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `innerEl` | `HTMLElement` | | The inner element to be auto sized. |
-| `containerEl` | `HTMLElement` | | The container element is used as bounding box for the inner element. |
-| `multiline` | `boolean` | `false` | Allow text to wrap and fill container width and height. |
-| `minFontSizePx` | `number` | `8` | The smallest font size the algorithm will use. |
-| `maxFontSizePx` | `number` | `160` | The largest font size the algorithm will use. |
+| `containerEl` | `HTMLElement` | | The container element defines the dimensions. |
+| `multiline` | `boolean` | `false` | Allow text to wrap to multiple lines. |
+| `minFontSizePx` | `number` | `8` | The minimum font size to be used. |
+| `maxFontSizePx` | `number` | `160` | The maximum font size to be used. |
+| `fontSizePrecisionPx` | `number` | `0.1` | The algorithm stops when reaching the precision. |
 
 ## Details
 
-* **The single-line algorithm** predicts how the browser will render text in a different font size and iterates until converging with an error of <= 0.1px (usually 1-2 iterations).
-* **The multi-line algorithm** performs a binary search among the possible font sizes until converging with an error of <= 0.1px (usually ~10 iterations). There is no reliable way of predicting how the browser will render text in a different font size when multi-line text wrap is at play.
-* **Performance** Each iteration has a performance hit. `AutoTextSize` uses `requestAnimationFrame` to throttle repeated calls, ensuring that we render as often as possible without excessively blocking the UI.
+* **The single-line algorithm** predicts how the browser will render text in a different font size and iterates until converging within `fontSizePrecisionPx` (usually 1-2 iterations).
+* **The multi-line algorithm** performs a binary search among the possible font sizes until converging within `fontSizePrecisionPx` (usually ~10 iterations). There is no reliable way of predicting how the browser will render text in a different font size when multi-line text wrap is at play.
+* **Performance** Each iteration has a performance hit. `requestAnimationFrame` is used to throttle repeated calls. In this way we render as often as possible without excessively blocking the UI.
 * **No overflow**. After usual iteration, the algorithms runs a second loop to ensure that no overflow occurs. Underflow is preferred since it doesn't look visually broken like overflow does.
-* **Font size** is used rather than transform scale since the latter wouldn't support multi-line text wrap. Transform scale would work for singleline but we prefer to keep the two modes similar. Furthermore, transform scale tends to make text blurry in some browsers.
+* **Font size** is used rather than transform scale since the latter wouldn't support multi-line text wrap. Transform scale would work for single-line but we prefer to keep the two modes similar. Furthermore, transform scale tends to make text blurry in some browsers.
 
 ## Developing
 
@@ -108,7 +110,7 @@ yarn dev
 
 ### Yalc and HMR
 
-Using `yalk link` (or `yalc add--link`) makes it so that Next.js HMR detects updates instantly.
+Using `yalc link` (or `yalc add--link`) makes it so that Next.js HMR detects updates instantly.
 
 ### Publishing
 
