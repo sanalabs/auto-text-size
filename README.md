@@ -16,7 +16,7 @@ The text fills both the width and the height of the container, allowing wrapping
 
 <img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/assets/multi-line.gif" width="300" />
 
-[**Live demo**](https://codesandbox.io/s/github/sanalabs/auto-text-size/tree/main/example?file=/pages/index.tsx)
+[**Live demo**](https://stackblitz.com/github/sanalabs/auto-text-size/tree/main/example?file=pages%2Findex.tsx)
 
 ## React component
 
