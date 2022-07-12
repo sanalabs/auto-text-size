@@ -32,7 +32,7 @@ type AlgoOpts = {
  * Ensure no overflow. Underflow is preferred since it doesn't look visually
  * broken like overflow does.
  *
- * Some browsers (Safari) are not good with sub-pixel font sizing, making it so
+ * Some browsers (eg. Safari) are not good with sub-pixel font sizing, making it so
  * that visual overflow can occur unless we adjust for it.
  */
 const antiOverflowAlgo = ({
@@ -45,7 +45,7 @@ const antiOverflowAlgo = ({
   AlgoOpts,
   "fontSizePx" | "minFontSizePx" | "fontSizePrecisionPx" | "updateFontSizePx"
 > & { breakPredicate: () => boolean }): void => {
-  const maxIterCount = 1 / fontSizePrecisionPx;
+  const maxIterCount = Math.ceil(1 / fontSizePrecisionPx); // 1 px should always be enough.
   let iterCount = 0;
 
   while (fontSizePx > minFontSizePx && iterCount < maxIterCount) {
@@ -126,6 +126,9 @@ const singlelineAlgo = ({
   });
 };
 
+/**
+ * Binary search for the best font size in the range [minFontSizePx, maxFontSizePx].
+ */
 const multilineAlgo = ({
   innerEl,
   containerEl,
@@ -136,8 +139,12 @@ const multilineAlgo = ({
   updateFontSizePx,
 }: AlgoOpts) => {
   const maxIterCount = 100; // Safety fallback to avoid infinite loop
-  const decayFactor = 0.5; // Binary search. Don't change this number.
-  let updatePx = maxFontSizePx - minFontSizePx;
+
+  // Start the binary search in the middle.
+  fontSizePx = updateFontSizePx((maxFontSizePx - minFontSizePx) * 0.5);
+
+  // Each subsequent update will halve the search space.
+  let updatePx = (maxFontSizePx - minFontSizePx) * 0.25; 
   let iterCount = 0;
 
   while (updatePx > fontSizePrecisionPx && iterCount < maxIterCount) {
@@ -149,8 +156,6 @@ const multilineAlgo = ({
 
     if (w0 === w1 && h0 === h1) break;
 
-    updatePx *= decayFactor; // The first jump should be 50% of the total distance.
-
     /**
      * Use `<=` rather than `<` since equality is possible even though there is
      * room for resizing in the other dimension.
@@ -161,6 +166,7 @@ const multilineAlgo = ({
       fontSizePx = updateFontSizePx(fontSizePx - updatePx);
     }
 
+    updatePx *= 0.5; // Binary search. Don't change this number.
     iterCount++;
   }
 
@@ -237,7 +243,6 @@ export function updateTextSize({
     innerStyles.overflowWrap = "break-word";
   } else {
     innerStyles.whiteSpace = "nowrap";
-    innerStyles.overflow = "visible"; // Because of subpixel rounding and finite iteration, we may overshoot by a small amount
   }
 
   Object.assign(containerEl.style, containerStyles);
