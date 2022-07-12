@@ -8,15 +8,15 @@ The algorithm adjusts the font size of the text so that it precisely fills its c
 
 The text fills the width of the container, without wrapping to more than one line.
 
-<img src="./assets/single-line.gif" width="300" />
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/assets/single-line.gif" width="300" />
 
 ## Multi-line mode
 
 The text fills both the width and the height of the container, allowing wrapping to multiple lines.
 
-<img src="./assets/multi-line.gif" width="300" />
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/assets/multi-line.gif" width="300" />
 
-[**Live demo**](TODO)
+[**Live demo**](https://codesandbox.io/s/github/sanalabs/auto-text-size/tree/main/example?file=/pages/index.tsx)
 
 ## React component
 

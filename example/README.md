@@ -1,3 +1,3 @@
 # AutoTextSize demo app
 
-[**Live demo**](TODO)
+[**Live demo**](https://codesandbox.io/s/github/sanalabs/auto-text-size/tree/main/example?file=/pages/index.tsx)
