@@ -24,7 +24,7 @@ export default function Page() {
     <>
       <p>
         This is a demo of AutoTextSize. See the{" "}
-        <a href="https://github.com/sanalabs/auto-text-size">docs</a>.
+        <a href="https://github.com/sanalabs/auto-text-size#readme">docs</a>.
       </p>
 
       <h3>Config</h3>

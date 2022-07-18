@@ -2,21 +2,21 @@
 
 Make text fit container, prevent overflow and underflow.
 
-The algorithm adjusts the font size of the text so that it precisely fills its container. It uses computed width and height so it works for all types of fonts.
+The font size of the text is adjusted so that it precisely fills its container. It uses computed width and height so it works for all types of fonts and automatically re-runs when the element resizes.
+
+[**Live demo.**](https://stackblitz.com/github/sanalabs/auto-text-size/tree/main/example?file=pages%2Findex.tsx)
 
 ## Single-line mode
 
 The text fills the width of the container, without wrapping to more than one line.
 
-<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/assets/single-line.gif" width="300" />
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/single-line.gif" width="300" />
 
 ## Multi-line mode
 
 The text fills both the width and the height of the container, allowing wrapping to multiple lines.
 
-<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/assets/multi-line.gif" width="300" />
-
-[**Live demo**](https://stackblitz.com/github/sanalabs/auto-text-size/tree/main/example?file=pages%2Findex.tsx)
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/multi-line.gif" width="300" />
 
 ## React component
 
@@ -34,7 +34,7 @@ export const Title = ({ text }) => {
 }
 ```
 
-### `AutoTextSize` Props
+### `AutoTextSize` props
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -52,7 +52,7 @@ Zero dependencies.
 import { autoTextSize } from 'auto-text-size'
 
 // autoTextSize runs the returned function directly and
-// re-runs it when the container element changes size.
+// re-runs it when the container element resize.
 const updateTextSize = autoTextSize(options)
 
 // All invocations are throttled for performance. Manually
@@ -63,7 +63,7 @@ updateTextSize()
 updateTextSize.disconnect()
 ```
 
-One-off use:
+One-off:
 
 ```ts
 import { updateTextSize } from 'auto-text-size'
@@ -92,9 +92,9 @@ updateTextSize(options)
 
 ## Developing
 
-When developing one typically wants to see the output in the example application without having to publish and install. We achieve this by linking the local package into the example app.
+When developing one typically wants to see the output in the example application without having to publish and reinstall. This is achieved by linking the local package into the example app.
 
-Because of [issues with `yarn link`](https://github.com/facebook/react/issues/14257), we use [Yalc](https://github.com/wclr/yalc). A linking approach is preferred over yarn workspaces since we want to use the package as it would appear in the real world.
+Because of [issues with `yarn link`](https://github.com/facebook/react/issues/14257), [Yalc](https://github.com/wclr/yalc) is used instead. A linking approach is preferred over yarn workspaces since we want to use the package as it would appear in the real world.
 
 ```sh
 npm i yalc -g
@@ -115,7 +115,7 @@ Using `yalc link` (or `yalc add--link`) makes it so that Next.js HMR detects upd
 ### Publishing
 
 ```sh
-# Bump version number
+# Update version number
 yarn clean && yarn build
 npm publish
 ```

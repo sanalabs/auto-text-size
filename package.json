@@ -1,7 +1,13 @@
 {
   "name": "auto-text-size",
-  "version": "0.1.1",
+  "description": "Make text fit container, prevent overflow and underflow.",
+  "version": "0.1.2",
   "license": "MIT",
+  "homepage": "https://github.com/sanalabs/auto-text-size#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanalabs/auto-text-size.git"
+  },
   "author": "Viktor Qvarfordt",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

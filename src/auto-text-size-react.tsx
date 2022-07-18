@@ -2,6 +2,7 @@ import React, {
   DetailedHTMLProps,
   HTMLAttributes,
   ReactElement,
+  ReactHTML,
   useCallback,
   useEffect,
   useRef,
@@ -20,7 +21,7 @@ export function AutoTextSize({
   children,
   ...rest
 }: Options & {
-  as?: string | React.ComponentType<any>;
+  as?: keyof ReactHTML | React.ComponentType<any>;
 } & DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
