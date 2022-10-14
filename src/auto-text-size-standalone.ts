@@ -192,7 +192,7 @@ const boxAlgo = ({
 };
 
 export type Options = {
-  mode: "oneline" | "multiline" | "box";
+  mode?: "oneline" | "multiline" | "box" | undefined;
   minFontSizePx?: number | undefined;
   maxFontSizePx?: number | undefined;
   fontSizePrecisionPx?: number | undefined;
@@ -206,7 +206,7 @@ export type Options = {
 export function updateTextSize({
   innerEl,
   containerEl,
-  mode,
+  mode = "multiline",
   minFontSizePx = 8,
   maxFontSizePx = 160,
   fontSizePrecisionPx = 0.1,

@@ -44,7 +44,7 @@ export const Title = ({ text }) => {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `multiline` | `boolean` | `false` | Allow text to wrap to multiple lines. |
+| `mode` | `'oneline' \|  'multiline' \| 'box` | `'multiline'` | Determine how text will wrap. |
 | `minFontSizePx` | `number` | `8` | The minimum font size to be used. |
 | `maxFontSizePx` | `number` | `160` | The maximum font size to be used. |
 | `fontSizePrecisionPx` | `number` | `0.1` | The algorithm stops when reaching the precision. |
@@ -83,7 +83,7 @@ updateTextSize(options)
 | --- | --- | --- | --- |
 | `innerEl` | `HTMLElement` | | The inner element to be auto sized. |
 | `containerEl` | `HTMLElement` | | The container element defines the dimensions. |
-| `multiline` | `boolean` | `false` | Allow text to wrap to multiple lines. |
+| `mode` | `'oneline' \|  'multiline' \| 'box` | `'multiline'` | Determine how text will wrap. |
 | `minFontSizePx` | `number` | `8` | The minimum font size to be used. |
 | `maxFontSizePx` | `number` | `160` | The maximum font size to be used. |
 | `fontSizePrecisionPx` | `number` | `0.1` | The algorithm stops when reaching the precision. |
