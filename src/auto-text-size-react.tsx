@@ -13,7 +13,7 @@ import { autoTextSize, Options } from "./auto-text-size-standalone";
  * Make text fit container, prevent overflow and underflow.
  */
 export function AutoTextSize({
-  multiline,
+  mode,
   minFontSizePx,
   maxFontSizePx,
   fontSizePrecisionPx,
@@ -40,13 +40,13 @@ export function AutoTextSize({
       updateTextSizeRef.current = autoTextSize({
         innerEl,
         containerEl,
-        multiline,
+        mode,
         minFontSizePx,
         maxFontSizePx,
         fontSizePrecisionPx,
       });
     },
-    [multiline, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
+    [mode, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
   );
 
   return (

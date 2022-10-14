@@ -433,12 +433,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"auto-text-size@npm:*":
-  version: 0.1.0
-  resolution: "auto-text-size@npm:0.1.0"
+"auto-text-size@npm:latest":
+  version: 0.1.2
+  resolution: "auto-text-size@npm:0.1.2"
   peerDependencies:
     react: "*"
-  checksum: 0d167ba80b09271251c88f15ed0268ce454d714287b5e33ac9686b5612b4e491c49970ae561f473b034c2ef64df45f1eec6329bb727209caacede3012e4e5075
+  checksum: 6839c8f9710984ef3fa6dd575d5615b2d890883119c924aa83dd41684ffe8b422403d0d996bb2a850a847d83d9dd7b91759a6e07cb292f3295d76ba7d27b92bb
   languageName: node
   linkType: hard
 
@@ -978,7 +978,7 @@ __metadata:
     "@types/node": 18.0.3
     "@types/react": 18.0.15
     "@types/react-dom": 18.0.6
-    auto-text-size: "*"
+    auto-text-size: latest
     eslint: 8.19.0
     eslint-config-next: 12.2.0
     next: 12.2.0

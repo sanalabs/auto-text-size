@@ -4,7 +4,6 @@ import { useState } from "react";
 const containerStyle = {
   width: "50%",
   maxWidth: "400px",
-  height: "100px",
   border: "1px dashed #555",
   outline: "none",
   lineHeight: "1",
@@ -12,7 +11,7 @@ const containerStyle = {
 
 export default function Page() {
   const [text, setText] = useState("Lorem ipsum dolor sit amet");
-  const [minFontSizePx, setMinFontSizePx] = useState("8");
+  const [minFontSizePx, setMinFontSizePx] = useState("20");
   const [maxFontSizePx, setMaxFontSizePx] = useState("160");
   const [fontSizePrecisionPx, setFontSizePrecisionPx] = useState("0.1");
 
@@ -61,12 +60,13 @@ export default function Page() {
   let demo = (
     <>
       <p>
-        <strong>Single-line.</strong> Text fills the width of the container,
+        <strong>Oneline mode.</strong> Text fills the width of the container,
         without wrapping to more than one line.
       </p>
 
-      <div style={{ ...containerStyle, height: "unset" }}>
+      <div style={containerStyle}>
         <AutoTextSize
+          mode="oneline"
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
           fontSizePrecisionPx={parsedFontSizePrecisionPx}
@@ -78,13 +78,31 @@ export default function Page() {
       <hr style={{ margin: "1rem 0" }} />
 
       <p>
-        <strong>Multi-line.</strong> Text fills both the width and the height of
-        the container, allowing wrapping to multiple lines.
+        <strong>Multiline mode.</strong> Text fills the width of the container,
+        wrapping to more than one line if necessary.
       </p>
 
       <div style={containerStyle}>
         <AutoTextSize
-          multiline
+          mode="multiline"
+          minFontSizePx={parsedMinFontSizePx}
+          maxFontSizePx={parsedMaxFontSizePx}
+          fontSizePrecisionPx={parsedFontSizePrecisionPx}
+        >
+          {text}
+        </AutoTextSize>
+      </div>
+
+      <hr style={{ margin: "1rem 0" }} />
+
+      <p>
+        <strong>Box mode.</strong> Text fills both the width and the height of
+        the container, allowing wrapping to multiple lines.
+      </p>
+
+      <div style={{ ...containerStyle, height: "100px" }}>
+        <AutoTextSize
+          mode="box"
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
           fontSizePrecisionPx={parsedFontSizePrecisionPx}

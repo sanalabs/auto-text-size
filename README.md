@@ -6,17 +6,23 @@ The font size of the text is adjusted so that it precisely fills its container. 
 
 [**Live demo.**](https://stackblitz.com/github/sanalabs/auto-text-size/tree/main/example?file=pages%2Findex.tsx)
 
-## Single-line mode
+## Oneline mode
 
 The text fills the width of the container, without wrapping to more than one line.
 
-<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/single-line.gif" width="300" />
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/imgs/oneline-mode.gif" width="300" />
 
-## Multi-line mode
+## Multiline mode
+
+The text fills the width of the container, wrapping to more than one line if necessary.
+
+<!-- <img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/imgs/multiline-mode.gif" width="300" /> -->
+
+## Box mode
 
 The text fills both the width and the height of the container, allowing wrapping to multiple lines.
 
-<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/multi-line.gif" width="300" />
+<img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/imgs/box-mode.gif" width="300" />
 
 ## React component
 

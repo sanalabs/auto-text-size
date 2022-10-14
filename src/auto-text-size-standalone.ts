@@ -73,7 +73,17 @@ const getContentHeight = (element: HTMLElement): number => {
   );
 };
 
-const singlelineAlgo = ({
+const multilineAlgo = (opts: AlgoOpts): void => {
+  opts.innerEl.style.whiteSpace = "nowrap";
+
+  onelineAlgo(opts);
+
+  if (opts.innerEl.scrollWidth > getContentWidth(opts.containerEl)) {
+    opts.innerEl.style.whiteSpace = "normal";
+  }
+};
+
+const onelineAlgo = ({
   innerEl,
   containerEl,
   fontSizePx,
@@ -129,7 +139,7 @@ const singlelineAlgo = ({
 /**
  * Binary search for the best font size in the range [minFontSizePx, maxFontSizePx].
  */
-const multilineAlgo = ({
+const boxAlgo = ({
   innerEl,
   containerEl,
   fontSizePx,
@@ -144,7 +154,7 @@ const multilineAlgo = ({
   fontSizePx = updateFontSizePx((maxFontSizePx - minFontSizePx) * 0.5);
 
   // Each subsequent update will halve the search space.
-  let updatePx = (maxFontSizePx - minFontSizePx) * 0.25; 
+  let updatePx = (maxFontSizePx - minFontSizePx) * 0.25;
   let iterCount = 0;
 
   while (updatePx > fontSizePrecisionPx && iterCount < maxIterCount) {
@@ -182,7 +192,7 @@ const multilineAlgo = ({
 };
 
 export type Options = {
-  multiline?: boolean | undefined;
+  mode: "oneline" | "multiline" | "box";
   minFontSizePx?: number | undefined;
   maxFontSizePx?: number | undefined;
   fontSizePrecisionPx?: number | undefined;
@@ -196,7 +206,7 @@ export type Options = {
 export function updateTextSize({
   innerEl,
   containerEl,
-  multiline,
+  mode,
   minFontSizePx = 8,
   maxFontSizePx = 160,
   fontSizePrecisionPx = 0.1,
@@ -236,13 +246,14 @@ export function updateTextSize({
     display: "block", // Necessary to compute dimensions.
   };
 
-  if (multiline) {
-    innerStyles.whiteSpace = "pre-wrap";
-    innerStyles.wordBreak = "normal";
-    innerStyles.hyphens = "none";
-    innerStyles.overflowWrap = "break-word";
-  } else {
+  if (mode === "oneline") {
     innerStyles.whiteSpace = "nowrap";
+  } else if (mode === "multiline") {
+    innerStyles.wordBreak = "break-word";
+    // white-space is controlled dynamically in multiline mode
+  } else if (mode === "box") {
+    innerStyles.whiteSpace = "pre-wrap";
+    innerStyles.wordBreak = "break-word";
   }
 
   Object.assign(containerEl.style, containerStyles);
@@ -271,34 +282,29 @@ export function updateTextSize({
     updateFontSizePx(fontSizePx);
   }
 
-  if (multiline) {
-    multilineAlgo({
-      innerEl,
-      containerEl,
-      fontSizePx,
-      minFontSizePx,
-      maxFontSizePx,
-      fontSizePrecisionPx,
-      updateFontSizePx,
-    });
-  } else {
-    singlelineAlgo({
-      innerEl,
-      containerEl,
-      fontSizePx,
-      minFontSizePx,
-      maxFontSizePx,
-      fontSizePrecisionPx,
-      updateFontSizePx,
-    });
+  const algoOpts = {
+    innerEl,
+    containerEl,
+    fontSizePx,
+    minFontSizePx,
+    maxFontSizePx,
+    fontSizePrecisionPx,
+    updateFontSizePx,
+  };
+
+  if (mode === "oneline") {
+    onelineAlgo(algoOpts);
+  } else if (mode === "multiline") {
+    multilineAlgo(algoOpts);
+  } else if (mode === "box") {
+    boxAlgo(algoOpts);
   }
 
   const t1 = performance.now();
+  const duration = Math.round(t1 - t0);
 
   console.debug(
-    `AutoTextSize ${
-      multiline ? "multiline" : "singleline"
-    } ran ${iterations} iterations in ${Math.round(t1 - t0)}ms`
+    `AutoTextSize ${mode} ran ${iterations} iterations in ${duration}ms`
   );
 }
 
@@ -322,7 +328,7 @@ type DisconnectableFunction = {
 export function autoTextSize({
   innerEl,
   containerEl,
-  multiline,
+  mode,
   minFontSizePx,
   maxFontSizePx,
   fontSizePrecisionPx,
@@ -338,7 +344,7 @@ export function autoTextSize({
     updateTextSize({
       innerEl,
       containerEl,
-      multiline,
+      mode,
       maxFontSizePx,
       minFontSizePx,
       fontSizePrecisionPx,
