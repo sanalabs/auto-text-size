@@ -61,7 +61,7 @@ export default function Page() {
     <>
       <p>
         <strong>Oneline mode.</strong> Text fills the width of the container,
-        without wrapping to more than one line.
+        without wrapping to multiple lines.
       </p>
 
       <div style={containerStyle}>
@@ -79,7 +79,7 @@ export default function Page() {
 
       <p>
         <strong>Multiline mode.</strong> Text fills the width of the container,
-        wrapping to more than one line if necessary.
+        wrapping to multiple lines if necessary.
       </p>
 
       <div style={containerStyle}>

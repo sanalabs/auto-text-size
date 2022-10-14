@@ -8,13 +8,13 @@ The font size of the text is adjusted so that it precisely fills its container. 
 
 ## Oneline mode
 
-The text fills the width of the container, without wrapping to more than one line.
+The text fills the width of the container, without wrapping to multiple lines.
 
 <img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/imgs/oneline-mode.gif" width="300" />
 
 ## Multiline mode
 
-The text fills the width of the container, wrapping to more than one line if necessary.
+The text fills the width of the container, wrapping to multiple lines if necessary.
 
 <!-- <img src="https://raw.githubusercontent.com/sanalabs/auto-text-size/main/example/imgs/multiline-mode.gif" width="300" /> -->
 
