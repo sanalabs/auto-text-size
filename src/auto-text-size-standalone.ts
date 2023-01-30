@@ -299,9 +299,6 @@ export function updateTextSize({
   } else if (mode === "box") {
     boxAlgo(algoOpts);
   }
-
-  const t1 = performance.now();
-  const duration = Math.round(t1 - t0);
 }
 
 type DisconnectableFunction = {
