@@ -302,10 +302,6 @@ export function updateTextSize({
 
   const t1 = performance.now();
   const duration = Math.round(t1 - t0);
-
-  console.debug(
-    `AutoTextSize ${mode} ran ${iterations} iterations in ${duration}ms`
-  );
 }
 
 type DisconnectableFunction = {
