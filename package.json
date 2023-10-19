@@ -10,24 +10,32 @@
   },
   "author": "Viktor Qvarfordt",
   "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/cjs/index.d.ts",
   "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.js",
-    "default": "./dist/esm/index.js",
-    "types": "./dist/types/index.d.ts"
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.mts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
   },
   "files": [
     "src/**/*",
     "dist/**/*.js",
+    "dist/**/*.mjs",
     "dist/**/*.js.map",
     "dist/**/*.d.ts",
+    "dist/**/*.d.mts",
     "dist/**/*.d.ts.map"
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc & tsc --project tsconfig.cjs.json",
+    "build": "yarn clean && tsc && tsc --project tsconfig.cjs.json && find dist/esm/ -name \"*.js\" -execdir bash -c 'mv \"$1\" \"${1%.js}.mjs\"' - '{}' \\; && mv ./dist/esm/index.d.ts ./dist/esm/index.d.mts",
     "watch": "tsc-watch --onSuccess \"yalc push\""
   },
   "peerDependencies": {

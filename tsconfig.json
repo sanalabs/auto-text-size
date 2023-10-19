@@ -2,11 +2,11 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["dom"],
-    
+
     "module": "esnext",
     "declaration": true,
     "declarationMap": true,
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/esm",
     "outDir": "dist/esm",
 
     "sourceMap": true,
@@ -28,5 +28,5 @@
     "incremental": true,
     "jsx": "react"
   },
-  "include": ["src"],
+  "include": ["src"]
 }
