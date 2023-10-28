@@ -25,7 +25,6 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "incremental": true,
     "jsx": "react"
   },
   "include": ["src"]
