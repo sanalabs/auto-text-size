@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import { autoTextSize, Options } from "./auto-text-size-standalone";
+import { autoTextSize, Options } from "./auto-text-size-standalone.js";
 
 /**
  * Make text fit container, prevent overflow and underflow.
