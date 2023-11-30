@@ -106,6 +106,7 @@ export default function Page() {
           minFontSizePx={parsedMinFontSizePx}
           maxFontSizePx={parsedMaxFontSizePx}
           fontSizePrecisionPx={parsedFontSizePrecisionPx}
+          onUpdate={() => console.log('On update')}
         >
           {text}
         </AutoTextSize>

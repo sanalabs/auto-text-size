@@ -19,9 +19,11 @@ export function AutoTextSize({
   fontSizePrecisionPx,
   as: Comp = "div", // TODO: The `...rest` props are not typed to reflect another `as`.
   children,
+  onUpdate,
   ...rest
 }: Options & {
   as?: keyof ReactHTML | React.ComponentType<any>;
+  onUpdate: (() => void) | undefined;
 } & DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
@@ -44,9 +46,10 @@ export function AutoTextSize({
         minFontSizePx,
         maxFontSizePx,
         fontSizePrecisionPx,
+        onUpdate,
       });
     },
-    [mode, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
+    [mode, minFontSizePx, maxFontSizePx, fontSizePrecisionPx, onUpdate]
   );
 
   return (
