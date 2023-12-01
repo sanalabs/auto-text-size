@@ -325,9 +325,11 @@ export function autoTextSize({
   minFontSizePx,
   maxFontSizePx,
   fontSizePrecisionPx,
+  onUpdate,
 }: Options & {
   innerEl: HTMLElement;
   containerEl: HTMLElement;
+  onUpdate: (() => void) | undefined;
 }): DisconnectableFunction {
   // Initialize as `undefined` to always run directly when instantiating.
   let containerDimensions: [number, number] | undefined = undefined;
@@ -347,6 +349,8 @@ export function autoTextSize({
       getContentWidth(containerEl),
       getContentHeight(containerEl),
     ];
+
+    onUpdate?.();
   });
 
   const resizeObserver = new ResizeObserver(() => {
