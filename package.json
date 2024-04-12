@@ -1,7 +1,7 @@
 {
   "name": "auto-text-size",
   "description": "Make text fit container, prevent overflow and underflow.",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "license": "MIT",
   "homepage": "https://github.com/sanalabs/auto-text-size#readme",
   "repository": {
