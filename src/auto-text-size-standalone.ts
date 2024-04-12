@@ -192,7 +192,7 @@ const boxAlgo = ({
 };
 
 export type Options = {
-  mode?: "oneline" | "multiline" | "box" | undefined;
+  mode?: "oneline" | "multiline" | "box" | "boxoneline" | undefined;
   minFontSizePx?: number | undefined;
   maxFontSizePx?: number | undefined;
   fontSizePrecisionPx?: number | undefined;
@@ -254,6 +254,8 @@ export function updateTextSize({
   } else if (mode === "box") {
     innerStyles.whiteSpace = "pre-wrap";
     innerStyles.wordBreak = "break-word";
+  } else if (mode === "boxoneline") {
+    innerStyles.whiteSpace = "nowrap";
   }
 
   Object.assign(containerEl.style, containerStyles);
@@ -297,6 +299,8 @@ export function updateTextSize({
   } else if (mode === "multiline") {
     multilineAlgo(algoOpts);
   } else if (mode === "box") {
+    boxAlgo(algoOpts);
+  } else if (mode === "boxoneline") {
     boxAlgo(algoOpts);
   }
 }
