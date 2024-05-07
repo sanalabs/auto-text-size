@@ -34,7 +34,9 @@ export function AutoTextSize({
 
   useEffect(() => updateTextSizeRef.current?.(), [children]);
 
-  useImperativeHandle(onUpdateRef, () => onUpdate)
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
 
   const refCallback = useCallback(
     (innerEl: HTMLElement | null) => {
@@ -51,7 +53,7 @@ export function AutoTextSize({
         maxFontSizePx,
         fontSizePrecisionPx,
         // Not passing the callback ref directly so we can always get the latest value
-        onUpdate: () =>  onUpdateRef.current(),
+        onUpdate: () => onUpdateRef.current(),
       });
     },
     [mode, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
