@@ -47,13 +47,14 @@ export const Title = ({ text }) => {
 
 ### `AutoTextSize` props
 
-| Name | Type                                                 | Default | Description |
-| --- |------------------------------------------------------| --- | --- |
-| `mode` | `'oneline' \|  'multiline' \| 'box' \| 'boxoneline` | `'multiline'` | Determine how text will wrap. |
-| `minFontSizePx` | `number`                                             | `8` | The minimum font size to be used. |
-| `maxFontSizePx` | `number`                                             | `160` | The maximum font size to be used. |
-| `fontSizePrecisionPx` | `number`                                             | `0.1` | The algorithm stops when reaching the precision. |
-| `as` | `string \| ReactComponent`                           | `'div'` | The underlying component that `AutoTextSize` will use. |
+| Name                  | Type                                                | Default       | Description                                                                          |
+| --------------------- | --------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| `mode`                | `'oneline' \|  'multiline' \| 'box' \| 'boxoneline` | `'multiline'` | Determine how text will wrap.                                                        |
+| `minFontSizePx`       | `number`                                            | `8`           | The minimum font size to be used.                                                    |
+| `maxFontSizePx`       | `number`                                            | `160`         | The maximum font size to be used.                                                    |
+| `fontSizePrecisionPx` | `number`                                            | `0.1`         | The algorithm stops when reaching the precision.                                     |
+| `as`                  | `string \| ReactComponent`                          | `'div'`       | The underlying component that `AutoTextSize` will use.                               |
+| `onUpdate`            | `function`                                          | `undefined`   | Callback executed when the component first renders or the text size is recalculated. |
 
 ## Vanilla function
 
@@ -84,14 +85,15 @@ updateTextSize(options)
 
 ### `autoTextSize` options
 
-| Name | Type                                                | Default | Description |
-| --- |-----------------------------------------------------| --- | --- |
-| `innerEl` | `HTMLElement`                                       | | The inner element to be auto sized. |
-| `containerEl` | `HTMLElement`                                       | | The container element defines the dimensions. |
-| `mode` | `'oneline' \|  'multiline' \| 'box' \| 'boxoneline'` | `'multiline'` | Determine how text will wrap. |
-| `minFontSizePx` | `number`                                            | `8` | The minimum font size to be used. |
-| `maxFontSizePx` | `number`                                            | `160` | The maximum font size to be used. |
-| `fontSizePrecisionPx` | `number`                                            | `0.1` | The algorithm stops when reaching the precision. |
+| Name                  | Type                                                 | Default       | Description                                                                          |
+| --------------------- | ---------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| `innerEl`             | `HTMLElement`                                        |               | The inner element to be auto sized.                                                  |
+| `containerEl`         | `HTMLElement`                                        |               | The container element defines the dimensions.                                        |
+| `mode`                | `'oneline' \|  'multiline' \| 'box' \| 'boxoneline'` | `'multiline'` | Determine how text will wrap.                                                        |
+| `minFontSizePx`       | `number`                                             | `8`           | The minimum font size to be used.                                                    |
+| `maxFontSizePx`       | `number`                                             | `160`         | The maximum font size to be used.                                                    |
+| `fontSizePrecisionPx` | `number`                                             | `0.1`         | The algorithm stops when reaching the precision.                                     |
+| `onUpdate`            | `function`                                           | `undefined`   | Callback executed when the component first renders or the text size is recalculated. |
 
 ## Details
 

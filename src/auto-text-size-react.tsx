@@ -5,6 +5,7 @@ import React, {
   ReactHTML,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useRef,
 } from "react";
 import { autoTextSize, Options } from "./auto-text-size-standalone.js";
@@ -19,16 +20,23 @@ export function AutoTextSize({
   fontSizePrecisionPx,
   as: Comp = "div", // TODO: The `...rest` props are not typed to reflect another `as`.
   children,
+  onUpdate = () => {},
   ...rest
 }: Options & {
   as?: keyof ReactHTML | React.ComponentType<any>;
+  onUpdate?(): void;
 } & DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >): ReactElement {
   const updateTextSizeRef = useRef<ReturnType<typeof autoTextSize>>();
+  const onUpdateRef = useRef<typeof onUpdate>(onUpdate);
 
   useEffect(() => updateTextSizeRef.current?.(), [children]);
+
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
 
   const refCallback = useCallback(
     (innerEl: HTMLElement | null) => {
@@ -44,6 +52,8 @@ export function AutoTextSize({
         minFontSizePx,
         maxFontSizePx,
         fontSizePrecisionPx,
+        // Not passing the callback ref directly so we can always get the latest value
+        onUpdate: () => onUpdateRef.current(),
       });
     },
     [mode, minFontSizePx, maxFontSizePx, fontSizePrecisionPx]
